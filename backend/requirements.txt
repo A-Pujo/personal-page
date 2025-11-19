@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=1.4
+pymysql
+alembic
+python-dotenv
+PyJWT>=2.8
+passlib[bcrypt]>=1.7
