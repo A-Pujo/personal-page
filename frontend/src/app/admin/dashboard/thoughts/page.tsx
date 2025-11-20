@@ -16,6 +16,14 @@ export default function AdminThoughtsPage() {
         </div>
         <div className="mb-4 flex items-center gap-4">
           <h1 className="text-2xl font-bold">Manage Thoughts</h1>
+          <div className="ml-auto">
+            <Link
+              href="/admin/dashboard/thoughts/new"
+              className="px-3 py-1 bg-[var(--apujo-blue)] text-white rounded text-sm"
+            >
+              New Thought
+            </Link>
+          </div>
         </div>
         <AdminThoughtsPanel />
       </main>

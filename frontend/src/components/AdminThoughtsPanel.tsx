@@ -1,15 +1,15 @@
 "use client";
 import React, { useEffect, useState, useRef, useMemo } from "react";
+import { decode } from "html-entities";
+import Link from "next/link";
 import * as api from "../lib/api";
-import Toast from "./Toast";
 import Spinner from "./Spinner";
+import { toast } from "react-toastify";
+import { Eye, PencilIcon, Trash } from "lucide-react";
 
 export default function AdminThoughtsPanel() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ msg: string; kind?: string } | null>(
-    null
-  );
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -18,6 +18,7 @@ export default function AdminThoughtsPanel() {
     excerpt: "",
     content: "",
     tags: "",
+    featured_img: "",
     published: false,
   });
   const editorRef = useRef<any>(null);
@@ -25,12 +26,37 @@ export default function AdminThoughtsPanel() {
     () => `tinymce-${Math.random().toString(36).slice(2, 8)}`,
     []
   );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const resolveImg = (p?: string | null) => {
+    if (!p) return null;
+    if (p.startsWith("http") || p.startsWith("data:")) return p;
+    const base = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:6363";
+    return `${base}${p}`;
+  };
+
+  function decodeEntities(s: string) {
+    try {
+      let out = decode(s || "");
+      if (
+        out.includes("&lt;") ||
+        out.includes("&gt;") ||
+        out.includes("&amp;")
+      ) {
+        out = decode(out);
+      }
+      return out;
+    } catch {
+      return s;
+    }
+  }
 
   async function load() {
     setLoading(true);
     const res = await api.listThoughts(page * pageSize, pageSize);
     if (res.ok) setItems((res as any).data);
-    else setToast({ msg: res.error || "Failed to load", kind: "error" });
+    else toast.error(res.error || "Failed to load");
     setLoading(false);
   }
 
@@ -50,24 +76,11 @@ export default function AdminThoughtsPanel() {
 
   async function remove(slug: string) {
     const res = await api.deleteThought(slug);
-    if (!res.ok) setToast({ msg: res.error || "Delete failed", kind: "error" });
+    if (!res.ok) toast.error(res.error || "Delete failed");
     else {
-      setToast({ msg: "Deleted", kind: "success" });
+      toast.success("Deleted");
       load();
     }
-  }
-
-  function openCreate() {
-    setEditing(null);
-    setForm({
-      slug: "",
-      title: "",
-      excerpt: "",
-      content: "",
-      tags: "",
-      published: false,
-    });
-    setShowForm(true);
   }
 
   function openEdit(t: any) {
@@ -76,10 +89,13 @@ export default function AdminThoughtsPanel() {
       slug: t.slug,
       title: t.title,
       excerpt: t.excerpt || "",
-      content: t.content || "",
+      content: decodeEntities(t.content || ""),
       tags: (t.tags || []).join(","),
+      featured_img: t.featured_img || "",
       published: !!t.published,
     });
+    setPreviewUrl(resolveImg(t.featured_img || null));
+    setSelectedFile(null);
     setShowForm(true);
   }
 
@@ -153,9 +169,19 @@ export default function AdminThoughtsPanel() {
             .map((s) => s.trim())
             .filter(Boolean)
         : [],
+      featured_img: form.featured_img || null,
       published: form.published,
     };
     let res;
+    // If user selected a new image file, upload it first
+    if (selectedFile) {
+      const upl = await api.uploadImage(selectedFile);
+      if (!upl.ok) {
+        toast.error(upl.error || "Image upload failed");
+        return;
+      }
+      payload.featured_img = (upl as any).data?.url || null;
+    }
     if (editing) {
       res = await api.updateThought(editing, payload);
     } else {
@@ -163,9 +189,9 @@ export default function AdminThoughtsPanel() {
     }
 
     if (!res.ok) {
-      setToast({ msg: res.error || "Save failed", kind: "error" });
+      toast.error(res.error || "Save failed");
     } else {
-      setToast({ msg: editing ? "Updated" : "Created", kind: "success" });
+      toast.success(editing ? "Updated" : "Created");
       setShowForm(false);
       load();
     }
@@ -174,82 +200,7 @@ export default function AdminThoughtsPanel() {
   return (
     <div>
       {loading ? <Spinner /> : null}
-      {toast ? <Toast message={toast.msg} kind={toast.kind as any} /> : null}
       <div className="space-y-4 mt-4">
-        <div className="flex items-center justify-between mb-4">
-          <div />
-          <div>
-            <button
-              onClick={openCreate}
-              className="px-3 py-2 bg-[var(--apujo-blue)] text-xs text-white rounded"
-            >
-              New Thought
-            </button>
-          </div>
-        </div>
-        {showForm ? (
-          <form onSubmit={submitForm} className="p-4 border rounded mb-4">
-            <div className="grid grid-cols-1 gap-2">
-              <input
-                value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                placeholder="slug (lowercase-dash)"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="title"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.excerpt}
-                onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                placeholder="excerpt"
-                className="border px-2 py-1"
-              />
-              {/* TinyMCE textarea: id used to init editor when form shown */}
-              <textarea
-                id={editorId}
-                defaultValue={form.content}
-                placeholder="content (HTML allowed)"
-                className="border px-2 py-1"
-                rows={6}
-              />
-              <input
-                value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                placeholder="tags (comma separated)"
-                className="border px-2 py-1"
-              />
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.published}
-                  onChange={(e) =>
-                    setForm({ ...form, published: e.target.checked })
-                  }
-                />{" "}
-                Published
-              </label>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="px-3 py-2 bg-green-600 text-white rounded"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-3 py-2 border rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </form>
-        ) : null}
         {items.map((t) => (
           <div key={t.id} className="p-4 border rounded flex justify-between">
             <div>
@@ -262,19 +213,32 @@ export default function AdminThoughtsPanel() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <a
-                className="text-blue-600"
+              {(() => {
+                const src = resolveImg(t.featured_img || null);
+                return src ? (
+                  <img
+                    src={src}
+                    alt="thumb"
+                    className="w-20 h-14 object-cover rounded"
+                  />
+                ) : null;
+              })()}
+              <Link
+                className="text-white bg-blue-600 px-2 py-1 rounded"
                 href={`/thoughts/${t.slug}`}
                 target="_blank"
                 rel="noreferrer"
               >
-                View
-              </a>
-              <button onClick={() => openEdit(t)} className="text-yellow-600">
-                Edit
-              </button>
+                <Eye />
+              </Link>
+              <Link
+                href={`/admin/dashboard/thoughts/${t.slug}`}
+                className="text-white bg-yellow-600 px-2 py-1 rounded"
+              >
+                <PencilIcon />
+              </Link>
               <button onClick={() => remove(t.slug)} className="text-red-600">
-                Delete
+                <Trash />
               </button>
             </div>
           </div>

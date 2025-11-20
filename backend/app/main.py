@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 import os
 import logging
-from .routers import thoughts, works, auth
+from .routers import thoughts, works, auth, uploads, images
 
 
 app = FastAPI(title="A-Pujo Backend")
@@ -23,6 +24,26 @@ app.add_middleware(
 app.include_router(thoughts.router)
 app.include_router(works.router)
 app.include_router(auth.router)
+app.include_router(uploads.router)
+app.include_router(images.router)
+
+# Serve backend static files (uploads)
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static"))
+if os.path.isdir(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+@app.on_event("startup")
+def ensure_upload_dirs():
+    # Ensure both uploads subdirectories exist for thoughts and works
+    try:
+        base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static", "uploads"))
+        thoughts_dir = os.path.join(base, "thoughts")
+        works_dir = os.path.join(base, "works")
+        os.makedirs(thoughts_dir, exist_ok=True)
+        os.makedirs(works_dir, exist_ok=True)
+    except Exception:
+        logger.exception("Failed to ensure upload directories")
 
 
 @app.on_event("startup")

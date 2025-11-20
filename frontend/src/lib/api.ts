@@ -153,6 +153,52 @@ export async function createThought(payload: any) {
   return call(`/api/thoughts/`, { method: "post", data: payload });
 }
 
+export async function uploadImage(file: File) {
+  try {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await instance.request({
+      url: "/api/uploads/",
+      method: "post",
+      data: form,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return { ok: true, data: res.data } as ApiResult<any>;
+  } catch (err: any) {
+    return {
+      ok: false,
+      status: err.response?.status || 500,
+      error: err.message,
+      details: err.response?.data,
+    } as ApiResult<any>;
+  }
+}
+
+export async function uploadImageWithCategory(
+  file: File,
+  category: string = "thoughts"
+) {
+  try {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("category", category);
+    const res = await instance.request({
+      url: "/api/uploads/",
+      method: "post",
+      data: form,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return { ok: true, data: res.data } as ApiResult<any>;
+  } catch (err: any) {
+    return {
+      ok: false,
+      status: err.response?.status || 500,
+      error: err.message,
+      details: err.response?.data,
+    } as ApiResult<any>;
+  }
+}
+
 export async function updateThought(slug: string, payload: any) {
   return call(`/api/thoughts/${encodeURIComponent(slug)}`, {
     method: "put",
@@ -198,6 +244,7 @@ export default {
   createThought,
   updateThought,
   deleteThought,
+  uploadImage,
   listWorks,
   getWork,
   createWork,

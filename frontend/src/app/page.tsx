@@ -8,9 +8,9 @@ export default function Home() {
               A-Pujo
             </h1>
             <p className="text-lg text-zinc-700 dark:text-zinc-300 max-w-xl">
-              Design-focused frontend developer. I build elegant and fast
-              personal sites, blogs, and small web apps. I care about
-              typography, clarity, and performance.
+              Just like random-walk hypothesis said, prices change randomly and
+              unpredictable, so does life. But here I am passionate in creating
+              stuff and delving economic policies.
             </p>
 
             <div className="flex flex-wrap gap-3">

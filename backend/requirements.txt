@@ -6,3 +6,4 @@ alembic
 python-dotenv
 PyJWT>=2.8
 passlib[bcrypt]>=1.7
+Pillow>=10.0

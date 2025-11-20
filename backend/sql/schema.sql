@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `thoughts` (
   `title` VARCHAR(300) NOT NULL,
   `excerpt` VARCHAR(500) DEFAULT NULL,
   `content` LONGTEXT NOT NULL,
+  `featured_img` VARCHAR(1000) DEFAULT NULL,
   `published` TINYINT(1) NOT NULL DEFAULT 0,
   `published_at` DATETIME DEFAULT NULL,
   `tags` JSON DEFAULT NULL,

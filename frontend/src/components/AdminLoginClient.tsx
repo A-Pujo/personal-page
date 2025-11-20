@@ -3,16 +3,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as api from "../lib/api";
-import Toast from "./Toast";
 import Spinner from "./Spinner";
+import { toast } from "react-toastify";
 
 export default function AdminLoginClient() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{ msg: string; kind?: string } | null>(
-    null
-  );
   const router = useRouter();
 
   async function submit(e: React.FormEvent) {
@@ -20,15 +17,12 @@ export default function AdminLoginClient() {
     setLoading(true);
     const res = await api.authLogin(username, password);
     if (!res.ok) {
-      setToast({
-        msg: res.error || `Login failed (${res.status})`,
-        kind: "error",
-      });
+      toast.error(res.error || `Login failed (${res.status})`);
       setLoading(false);
       return;
     }
 
-    setToast({ msg: "Login successful", kind: "success" });
+    toast.success("Login successful");
     // wait 2 seconds then redirect
     setTimeout(() => {
       router.push("/admin/dashboard");
@@ -66,7 +60,6 @@ export default function AdminLoginClient() {
           </button>
         </div>
       </form>
-      {toast ? <Toast message={toast.msg} kind={toast.kind as any} /> : null}
     </div>
   );
 }

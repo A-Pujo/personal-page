@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Nav from "../components/Nav";
 
 const inter = Inter({
@@ -31,6 +33,7 @@ export default function RootLayout({
         <main className="min-h-screen bg-zinc-50 dark:bg-black md:pl-28 p-6">
           {children}
         </main>
+        <ToastContainer position="bottom-right" />
       </body>
     </html>
   );

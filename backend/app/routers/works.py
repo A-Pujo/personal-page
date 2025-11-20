@@ -7,6 +7,26 @@ from ..validators import validate_slug, validate_title
 from .auth import get_current_user
 from fastapi import Depends
 import pymysql
+import os
+_UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static", "uploads", "thoughts"))
+
+
+def _delete_uploaded_file_from_path(path: str):
+    if not path:
+        return
+    try:
+        parts = path.split("/")
+        if len(parts) >= 5:
+            category = parts[3]
+            fname = parts[4]
+        else:
+            category = "works"
+            fname = os.path.basename(path)
+        p = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static", "uploads", category, fname))
+        if os.path.isfile(p):
+            os.remove(p)
+    except Exception:
+        pass
 
 router = APIRouter(prefix="/api/works", tags=["works"])
 
@@ -150,8 +170,25 @@ def update_work(slug: str, payload: schemas.WorkUpdate, current_user: str = Depe
             existing = cur.fetchone()
             if not existing:
                 raise HTTPException(status_code=404, detail="Work not found")
+            # if images are being updated, capture old images to delete
+            old_images = None
+            if "images" in update_fields:
+                cur.execute("SELECT images FROM works WHERE slug = %s LIMIT 1", (slug,))
+                t = cur.fetchone()
+                old_images = t.get("images") if t else None
 
             cur.execute(f"UPDATE works SET {set_clause} WHERE slug = %s", tuple(params))
+            # delete any old images that were removed
+            if old_images and update_fields.get("images"):
+                try:
+                    old_list = json.loads(old_images) if isinstance(old_images, str) else old_images
+                    new_list = json.loads(update_fields.get("images")) if isinstance(update_fields.get("images"), str) else update_fields.get("images")
+                    if isinstance(old_list, list):
+                        for img in old_list:
+                            if img and img not in (new_list or []):
+                                _delete_uploaded_file_from_path(img)
+                except Exception:
+                    pass
             cur.execute(
                 "SELECT id, slug, title, description, year, url, repo, images, tech, published, created_at, updated_at FROM works WHERE id = %s",
                 (existing["id"],),
@@ -177,10 +214,21 @@ def update_work(slug: str, payload: schemas.WorkUpdate, current_user: str = Depe
 def delete_work(slug: str, current_user: str = Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id FROM works WHERE slug = %s LIMIT 1", (slug,))
+            cur.execute("SELECT id, images FROM works WHERE slug = %s LIMIT 1", (slug,))
             existing = cur.fetchone()
             if not existing:
                 raise HTTPException(status_code=404, detail="Work not found")
+            # delete images referenced by this work
+            try:
+                imgs = existing.get("images")
+                if imgs:
+                    lst = json.loads(imgs) if isinstance(imgs, str) else imgs
+                    if isinstance(lst, list):
+                        for img in lst:
+                            if img:
+                                _delete_uploaded_file_from_path(img)
+            except Exception:
+                pass
             cur.execute("DELETE FROM works WHERE id = %s", (existing["id"],))
 
     return None

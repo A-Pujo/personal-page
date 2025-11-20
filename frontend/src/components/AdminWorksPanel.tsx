@@ -1,15 +1,13 @@
 "use client";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import * as api from "../lib/api";
-import Toast from "./Toast";
+import { toast } from "react-toastify";
 import Spinner from "./Spinner";
 
 export default function AdminWorksPanel() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ msg: string; kind?: string } | null>(
-    null
-  );
+
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -33,7 +31,7 @@ export default function AdminWorksPanel() {
     setLoading(true);
     const res = await api.listWorks(page * pageSize, pageSize);
     if (res.ok) setItems((res as any).data);
-    else setToast({ msg: res.error || "Failed to load", kind: "error" });
+    else toast.error(res.error || "Failed to load");
     setLoading(false);
   }
 
@@ -51,9 +49,9 @@ export default function AdminWorksPanel() {
 
   async function remove(slug: string) {
     const res = await api.deleteWork(slug);
-    if (!res.ok) setToast({ msg: res.error || "Delete failed", kind: "error" });
+    if (!res.ok) toast.error(res.error || "Delete failed");
     else {
-      setToast({ msg: "Deleted", kind: "success" });
+      toast.success("Deleted");
       load();
     }
   }
@@ -172,9 +170,9 @@ export default function AdminWorksPanel() {
     }
 
     if (!res.ok) {
-      setToast({ msg: res.error || "Save failed", kind: "error" });
+      toast.error(res.error || "Save failed");
     } else {
-      setToast({ msg: editing ? "Updated" : "Created", kind: "success" });
+      toast.success(editing ? "Updated" : "Created");
       setShowForm(false);
       load();
     }
@@ -183,99 +181,7 @@ export default function AdminWorksPanel() {
   return (
     <div>
       {loading ? <Spinner /> : null}
-      {toast ? <Toast message={toast.msg} kind={toast.kind as any} /> : null}
       <div className="space-y-4 mt-4">
-        <div className="flex items-center justify-between mb-4">
-          <div />
-          <div>
-            <button
-              onClick={openCreate}
-              className="px-3 py-2 bg-[var(--apujo-blue)] text-xs text-white rounded"
-            >
-              New Work
-            </button>
-          </div>
-        </div>
-        {showForm ? (
-          <form onSubmit={submitForm} className="p-4 border rounded mb-4">
-            <div className="grid grid-cols-1 gap-2">
-              <input
-                value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                placeholder="slug"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="title"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.year}
-                onChange={(e) => setForm({ ...form, year: e.target.value })}
-                placeholder="year"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.url}
-                onChange={(e) => setForm({ ...form, url: e.target.value })}
-                placeholder="url"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.repo}
-                onChange={(e) => setForm({ ...form, repo: e.target.value })}
-                placeholder="repo"
-                className="border px-2 py-1"
-              />
-              <textarea
-                id={editorId}
-                defaultValue={form.description}
-                placeholder="description"
-                className="border px-2 py-1"
-                rows={4}
-              />
-              <input
-                value={form.tech}
-                onChange={(e) => setForm({ ...form, tech: e.target.value })}
-                placeholder="tech (comma separated)"
-                className="border px-2 py-1"
-              />
-              <input
-                value={form.images}
-                onChange={(e) => setForm({ ...form, images: e.target.value })}
-                placeholder="images (comma separated URLs)"
-                className="border px-2 py-1"
-              />
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.published}
-                  onChange={(e) =>
-                    setForm({ ...form, published: e.target.checked })
-                  }
-                />{" "}
-                Published
-              </label>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="px-3 py-2 bg-green-600 text-white rounded"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-3 py-2 border rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </form>
-        ) : null}
         {items.map((w) => (
           <div key={w.id} className="p-4 border rounded flex justify-between">
             <div>

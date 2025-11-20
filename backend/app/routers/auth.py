@@ -93,6 +93,20 @@ def get_current_user(authorization: str = Header(None)):
     return user
 
 
+@router.get("/me")
+def me(authorization: str = Header(None)):
+    """Return current user username from Authorization header or 401."""
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid auth header")
+    user = verify_token(parts[1])
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return {"username": user}
+
+
 @router.post("/refresh", response_model=TokenOut)
 def refresh_tokens(payload: RefreshIn):
     token = payload.refresh_token

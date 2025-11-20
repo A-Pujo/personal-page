@@ -7,6 +7,7 @@ class ThoughtBase(BaseModel):
     slug: str
     title: str
     excerpt: Optional[str] = None
+    featured_img: Optional[str] = None
     content: str
     tags: Optional[List[str]] = None
 
