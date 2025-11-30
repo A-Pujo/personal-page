@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import os
 import logging
-from .routers import thoughts, works, auth, uploads, images
+from .routers import thoughts, works, auth, uploads, images, analytics
 
 
 app = FastAPI(title="A-Pujo Backend")
@@ -26,9 +26,20 @@ app.include_router(works.router)
 app.include_router(auth.router)
 app.include_router(uploads.router)
 app.include_router(images.router)
+app.include_router(analytics.router)
 
 # Serve backend static files (uploads)
-static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static"))
+# Allow overriding the static root (useful in shared hosting where project
+# files are deployed under a different document root). Set `BACKEND_STATIC_ROOT`
+# to the full path of the folder that contains `static/` (for example
+# `/home/apujomyi/domains/api.a-pujo.my.id`). If unset, fall back to package-relative path.
+APP_ROOT_DIR = os.getenv(
+    "BACKEND_STATIC_ROOT",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
+
+static_dir = os.path.join(APP_ROOT_DIR, "static")
+
 if os.path.isdir(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
@@ -37,11 +48,14 @@ if os.path.isdir(static_dir):
 def ensure_upload_dirs():
     # Ensure both uploads subdirectories exist for thoughts and works
     try:
-        base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static", "uploads"))
+        # Use the same static_dir computed above so uploads live under the mounted static path
+        base = os.path.abspath(os.path.join(APP_ROOT_DIR, "static", "uploads"))
         thoughts_dir = os.path.join(base, "thoughts")
         works_dir = os.path.join(base, "works")
+        analytics_dir = os.path.join(base, "analytics")
         os.makedirs(thoughts_dir, exist_ok=True)
         os.makedirs(works_dir, exist_ok=True)
+        os.makedirs(analytics_dir, exist_ok=True)
     except Exception:
         logger.exception("Failed to ensure upload directories")
 

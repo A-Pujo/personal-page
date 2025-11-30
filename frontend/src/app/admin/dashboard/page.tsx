@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Briefcase, FileText } from "lucide-react";
+import { Briefcase, ChartColumn, FileText } from "lucide-react";
 
 export default function DashboardPage() {
   return (
@@ -31,6 +31,19 @@ export default function DashboardPage() {
               <div>
                 <h3 className="font-semibold">Works</h3>
                 <p className="text-sm text-zinc-600">Manage portfolio items</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/admin/dashboard/analytics"
+            className="block p-6 border rounded hover:shadow"
+          >
+            <div className="flex items-center gap-3">
+              <ChartColumn />
+              <div>
+                <h3 className="font-semibold">Analytics</h3>
+                <p className="text-sm text-zinc-600">Manage analytics</p>
               </div>
             </div>
           </Link>

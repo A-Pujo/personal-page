@@ -2,8 +2,8 @@
 import React, { useEffect, useRef, useState, use } from "react";
 import { decode } from "html-entities";
 import { useRouter } from "next/navigation";
-import * as api from "../../../../../lib/api";
-import Spinner from "../../../../../components/Spinner";
+import { getThought, updateThought, uploadImage } from "@/lib/api";
+import Spinner from "@/components/Spinner";
 import { toast } from "react-toastify";
 
 const resolveImg = (p?: string | null) => {
@@ -45,7 +45,7 @@ export default function EditThoughtPage(props: any) {
     let mounted = true;
     async function load() {
       setLoading(true);
-      const res = await api.getThought(slug);
+      const res = await getThought(slug);
       if (!mounted) return;
       if (!res.ok) {
         toast.error(res.error || "Failed to load");
@@ -172,7 +172,7 @@ export default function EditThoughtPage(props: any) {
     };
 
     if (selectedFile) {
-      const upl = await api.uploadImage(selectedFile);
+      const upl = await uploadImage(selectedFile);
       if (!upl.ok) {
         toast.error(upl.error || "Image upload failed");
         setSaving(false);
@@ -181,7 +181,7 @@ export default function EditThoughtPage(props: any) {
       payload.featured_img = (upl as any).data?.url || null;
     }
 
-    const res = await api.updateThought(slug, payload);
+    const res = await updateThought(slug, payload);
     setSaving(false);
     if (!res.ok) {
       toast.error(res.error || "Save failed");
@@ -208,9 +208,9 @@ export default function EditThoughtPage(props: any) {
         <form onSubmit={submit} className="space-y-3">
           <input
             value={form.slug}
-            onChange={(e) => setForm({ ...form, slug: e.target.value })}
+            readOnly
             placeholder="slug (lowercase-dash)"
-            className="border px-2 py-1 w-full"
+            className="border bg-gray-200 px-2 py-1 w-full"
           />
           <input
             value={form.title}

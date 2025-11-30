@@ -13,7 +13,7 @@ def _uploads_base():
 @router.get("/{category}/{filename}")
 def serve_image(category: str, filename: str):
     base = _uploads_base()
-    if category not in ("thoughts", "works"):
+    if category not in ("thoughts", "works", "analytics"):
         raise HTTPException(status_code=404, detail="Image not found")
     path = os.path.join(base, category, filename)
     if not os.path.isfile(path):
@@ -25,7 +25,7 @@ def serve_image(category: str, filename: str):
 @router.get("/{category}/{filename}/blob")
 def serve_image_blob(category: str, filename: str):
     base = _uploads_base()
-    if category not in ("thoughts", "works"):
+    if category not in ("thoughts", "works", "analytics"):
         raise HTTPException(status_code=404, detail="Image not found")
     path = os.path.join(base, category, filename)
     if not os.path.isfile(path):

@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:6363";
+export const API_BASE = BASE;
 
 const instance = axios.create({
   baseURL: BASE,
@@ -39,7 +40,10 @@ type ApiResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; error?: string; details?: any };
 
-async function call<T>(path: string, opts?: { method?: string; data?: any }) {
+export async function call<T>(
+  path: string,
+  opts?: { method?: string; data?: any }
+) {
   try {
     const res = await instance.request<T>({
       url: path,
@@ -161,7 +165,7 @@ export async function uploadImage(file: File) {
       url: "/api/uploads/",
       method: "post",
       data: form,
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": undefined as any },
     });
     return { ok: true, data: res.data } as ApiResult<any>;
   } catch (err: any) {
@@ -186,7 +190,7 @@ export async function uploadImageWithCategory(
       url: "/api/uploads/",
       method: "post",
       data: form,
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": undefined as any },
     });
     return { ok: true, data: res.data } as ApiResult<any>;
   } catch (err: any) {
@@ -235,6 +239,62 @@ export async function deleteWork(slug: string) {
   return call(`/api/works/${encodeURIComponent(slug)}`, { method: "delete" });
 }
 
+export async function listAnalytic(skip = 0, limit = 10) {
+  return call(`/api/analytics/?skip=${skip}&limit=${limit}`);
+}
+
+export async function getAnalytic(slug: string) {
+  return call(`/api/analytics/${encodeURIComponent(slug)}`);
+}
+
+export async function createAnalytic(formData: FormData) {
+  try {
+    const url = `${BASE}/api/analytics/`;
+    const headers: Record<string, string> = {};
+    const auth = (instance.defaults.headers as any)?.common?.Authorization;
+    if (auth) headers["Authorization"] = auth;
+    const res = await fetch(url, { method: "POST", headers, body: formData });
+    const data = await res.json().catch(() => null);
+    if (!res.ok)
+      return {
+        ok: false,
+        status: res.status,
+        error: data?.detail || res.statusText,
+        details: data,
+      } as ApiResult<any>;
+    return { ok: true, data } as ApiResult<any>;
+  } catch (err: any) {
+    return { ok: false, status: 500, error: err.message } as ApiResult<any>;
+  }
+}
+
+export async function updateAnalytic(slug: string, formData: FormData) {
+  try {
+    const url = `${BASE}/api/analytics/${encodeURIComponent(slug)}`;
+    const headers: Record<string, string> = {};
+    const auth = (instance.defaults.headers as any)?.common?.Authorization;
+    if (auth) headers["Authorization"] = auth;
+    const res = await fetch(url, { method: "PUT", headers, body: formData });
+    const data = await res.json().catch(() => null);
+    if (!res.ok)
+      return {
+        ok: false,
+        status: res.status,
+        error: data?.detail || res.statusText,
+        details: data,
+      } as ApiResult<any>;
+    return { ok: true, data } as ApiResult<any>;
+  } catch (err: any) {
+    return { ok: false, status: 500, error: err.message } as ApiResult<any>;
+  }
+}
+
+export async function deleteAnalytic(slug: string) {
+  return call(`/api/analytics/${encodeURIComponent(slug)}`, {
+    method: "delete",
+  });
+}
+
 export default {
   authLogin,
   authLogout,
@@ -250,4 +310,10 @@ export default {
   createWork,
   updateWork,
   deleteWork,
+  // analytics
+  listAnalytic,
+  getAnalytic,
+  createAnalytic,
+  updateAnalytic,
+  deleteAnalytic,
 };

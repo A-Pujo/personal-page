@@ -71,3 +71,37 @@ class WorkOut(WorkBase):
 
     class Config:
         from_attributes = True
+
+
+class AnalyticBase(BaseModel):
+    slug: str
+    title: str
+    excerpt: Optional[str] = None
+    file_url: str
+    file_type: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+
+class AnalyticCreate(AnalyticBase):
+    published: Optional[bool] = False
+
+
+class AnalyticUpdate(BaseModel):
+    slug: Optional[str] = None
+    title: Optional[str] = None
+    excerpt: Optional[str] = None
+    file_url: Optional[str] = None
+    file_type: Optional[str] = None
+    tags: Optional[List[str]] = None
+    published: Optional[bool] = None
+
+
+class AnalyticOut(AnalyticBase):
+    id: int
+    published: bool
+    published_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

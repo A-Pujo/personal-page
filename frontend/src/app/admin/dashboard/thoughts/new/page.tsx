@@ -87,7 +87,6 @@ export default function NewThoughtPage() {
         }
       } catch {}
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function submit(e: React.FormEvent) {

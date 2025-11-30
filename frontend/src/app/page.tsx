@@ -1,4 +1,44 @@
-export default function Home() {
+import { decode } from "html-entities";
+
+function resolveImg(p?: string | null) {
+  if (!p) return null;
+  if (p.startsWith("http") || p.startsWith("data:")) return p;
+  const base = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:6363";
+  return `${base.replace(/\/$/, "")}${p}`;
+}
+
+function decodeEntities(s: string) {
+  try {
+    let out = decode(s || "");
+    if (out.includes("&lt;") || out.includes("&gt;") || out.includes("&amp;")) {
+      out = decode(out);
+    }
+    return out;
+  } catch (e) {
+    return s || "";
+  }
+}
+
+export default async function Home() {
+  const BASE = (
+    process.env.NEXT_PUBLIC_API_BASE || "http://localhost:6363"
+  ).replace(/\/$/, "");
+
+  async function fetchJson(path: string) {
+    try {
+      const res = await fetch(path, { next: { revalidate: 60 } });
+      if (!res.ok) return [];
+      return await res.json();
+    } catch (err) {
+      return [];
+    }
+  }
+
+  const [works, thoughts] = await Promise.all([
+    fetchJson(`${BASE}/api/works/?limit=3`),
+    fetchJson(`${BASE}/api/thoughts/?limit=3`),
+  ]);
+
   return (
     <div className="min-h-screen">
       <main className="mx-auto max-w-5xl px-6 py-20">
@@ -8,9 +48,9 @@ export default function Home() {
               A-Pujo
             </h1>
             <p className="text-lg text-zinc-700 dark:text-zinc-300 max-w-xl">
-              Just like random-walk hypothesis said, prices change randomly and
-              unpredictable, so does life. But here I am passionate in creating
-              stuff and delving economic policies.
+              Markets move in ways that often seem random, and life mirrors that
+              unpredictability. I channel my curiosity into building things and
+              exploring the intersection of technology and economics.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -38,21 +78,63 @@ export default function Home() {
 
         <section className="mt-16">
           <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
-            Latest
+            Latest Works
           </h2>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            <article className="rounded-md border border-slate-100 p-4 bg-white">
-              <h3 className="text-lg font-medium">Placeholder thought title</h3>
-              <p className="text-sm text-zinc-600 mt-2">
-                Short excerpt about the thought or article.
-              </p>
-            </article>
-            <article className="rounded-md border border-slate-100 p-4 bg-white">
-              <h3 className="text-lg font-medium">Project highlight</h3>
-              <p className="text-sm text-zinc-600 mt-2">
-                Short description of a recent project.
-              </p>
-            </article>
+          <div className="mt-6 grid gap-6 sm:grid-cols-3">
+            {Array.isArray(works) && works.length > 0 ? (
+              works.map((w: any) => (
+                <article
+                  key={w.id}
+                  className="rounded-md border border-slate-100 p-4 bg-white"
+                >
+                  <a
+                    href={`/works/${w.slug}`}
+                    className="text-lg font-medium hover:underline"
+                  >
+                    {w.title}
+                  </a>
+                  <p className="text-sm text-zinc-600 mt-2 line-clamp-3">
+                    {decodeEntities(w.excerpt || w.description || "").replace(
+                      /<[^>]+>/g,
+                      ""
+                    )}
+                  </p>
+                  {w.year ? (
+                    <div className="text-xs text-zinc-500 mt-2">{w.year}</div>
+                  ) : null}
+                </article>
+              ))
+            ) : (
+              <div className="text-sm text-zinc-500">No works found.</div>
+            )}
+          </div>
+        </section>
+
+        <section className="mt-10">
+          <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
+            Latest Thoughts
+          </h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-3">
+            {Array.isArray(thoughts) && thoughts.length > 0 ? (
+              thoughts.map((t: any) => (
+                <article
+                  key={t.id}
+                  className="rounded-md border border-slate-100 p-4 bg-white"
+                >
+                  <a
+                    href={`/thoughts/${t.slug}`}
+                    className="text-lg font-medium hover:underline"
+                  >
+                    {t.title}
+                  </a>
+                  <p className="text-sm text-zinc-600 mt-2 line-clamp-3">
+                    {decodeEntities(t.excerpt || "").replace(/<[^>]+>/g, "")}
+                  </p>
+                </article>
+              ))
+            ) : (
+              <div className="text-sm text-zinc-500">No thoughts found.</div>
+            )}
           </div>
         </section>
       </main>

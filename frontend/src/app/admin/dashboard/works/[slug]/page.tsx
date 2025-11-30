@@ -1,22 +1,27 @@
 "use client";
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
-import * as api from "../../../../../lib/api";
-import Spinner from "../../../../../components/Spinner";
+import * as api from "@/lib/api";
+import Spinner from "@/components/Spinner";
 import { toast } from "react-toastify";
+import { encode, decode } from "html-entities";
 
 export default function EditWorkPage(props: any) {
   const router = useRouter();
   const { slug } = use(props.params) as { slug: string };
+  const editorRef = useRef<any>(null);
+  const formRef = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<any>({
     slug: "",
     title: "",
-    excerpt: "",
-    content: "",
-    tags: "",
+    description: "",
+    tech: "",
     images: [],
+    repo: "",
+    url: "",
+    year: "",
     published: false,
   });
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -37,19 +42,26 @@ export default function EditWorkPage(props: any) {
       setForm({
         slug: w.slug,
         title: w.title,
-        excerpt: w.excerpt || "",
-        content: w.content || "",
-        tags: (w.tags || []).join(", "),
+        description: decode(w.description || ""),
+        tech: (w.tech || []).join(", "),
+        repo: w.repo || "",
+        url: w.url || "",
+        year: w.year || "",
         images: w.images || [],
         published: !!w.published,
       });
       setLoading(false);
+      console.log(res);
     }
     load();
     return () => {
       mounted = false;
     };
   }, [slug]);
+
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
 
   useEffect(() => {
     const ps = newFiles.map((f) => URL.createObjectURL(f));
@@ -72,20 +84,98 @@ export default function EditWorkPage(props: any) {
     return uploaded;
   }
 
+  useEffect(() => {
+    let mounted = true;
+    async function ensure() {
+      if (typeof (window as any).tinymce === "undefined") {
+        await new Promise<void>((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = "/js/tinymce/tinymce.min.js";
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error("Failed to load tinymce"));
+          document.head.appendChild(s);
+        });
+      }
+      if (!mounted) return;
+      const tm = (window as any).tinymce;
+      try {
+        tm.init({
+          license_key: "gpl",
+          selector: "#edit-work-content",
+          menubar: false,
+          plugins: ["link", "lists", "code", "image", "autoresize"],
+          toolbar:
+            "undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code",
+          setup(editor: any) {
+            editorRef.current = editor;
+            const handler = () => {
+              const content = editor.getContent();
+              setForm((f: any) => ({ ...f, description: content }));
+            };
+            editor.on("Change", handler);
+            editor.on("KeyUp", handler);
+          },
+          init_instance_callback(editor: any) {
+            const initial = formRef.current?.description || "";
+            editor.setContent(initial);
+          },
+        });
+      } catch {}
+    }
+    ensure();
+    return () => {
+      mounted = false;
+      try {
+        const tm = (window as any).tinymce;
+        if (tm && editorRef.current) {
+          editorRef.current.destroy();
+          editorRef.current = null;
+        }
+      } catch {}
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      const tm = (window as any).tinymce;
+      if (
+        tm &&
+        editorRef.current &&
+        typeof editorRef.current.setContent === "function"
+      ) {
+        // only update editor content when different to avoid feedback loops
+        try {
+          const current =
+            typeof editorRef.current.getContent === "function"
+              ? editorRef.current.getContent()
+              : null;
+          if (current !== (form.description || "")) {
+            editorRef.current.setContent(form.description || "");
+          }
+        } catch {
+          editorRef.current.setContent(form.description || "");
+        }
+      }
+    } catch {}
+    // only re-run when the description changes
+  }, [form.description]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     const payload: any = {
       slug: form.slug,
       title: form.title,
-      excerpt: form.excerpt,
-      content: form.content,
-      tags: form.tags
-        ? form.tags
+      description: encode(form.description),
+      tech: form.tech
+        ? form.tech
             .split(",")
             .map((s: string) => s.trim())
             .filter(Boolean)
         : [],
+      repo: form.repo,
+      url: form.url,
+      year: form.year,
       images: form.images || [],
       published: form.published,
     };
@@ -122,9 +212,9 @@ export default function EditWorkPage(props: any) {
         <form onSubmit={submit} className="space-y-3">
           <input
             value={form.slug}
-            onChange={(e) => setForm({ ...form, slug: e.target.value })}
+            readOnly
             placeholder="slug (lowercase-dash)"
-            className="border px-2 py-1 w-full"
+            className="border bg-gray-200 px-2 py-1 w-full"
           />
           <input
             value={form.title}
@@ -133,24 +223,41 @@ export default function EditWorkPage(props: any) {
             className="border px-2 py-1 w-full"
           />
           <input
-            value={form.excerpt}
-            onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-            placeholder="excerpt"
+            value={form.repo}
+            onChange={(e) => setForm({ ...form, repo: e.target.value })}
+            placeholder="repository URL"
             className="border px-2 py-1 w-full"
           />
-          <textarea
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            className="border w-full p-2"
-            rows={6}
+          <input
+            value={form.url}
+            onChange={(e) => setForm({ ...form, url: e.target.value })}
+            placeholder="project URL"
+            className="border px-2 py-1 w-full"
           />
+          <input
+            value={form.year}
+            onChange={(e) => setForm({ ...form, year: e.target.value })}
+            placeholder="year"
+            className="border px-2 py-1 w-full"
+          />
+          <div>
+            <div className="text-sm mb-1">Description</div>
+            <textarea
+              id="edit-work-content"
+              className="border w-full p-2"
+              rows={6}
+            />
+          </div>
 
           <div>
             <div className="text-sm mb-1">Existing images</div>
             <div className="flex gap-2 flex-wrap">
               {(form.images || []).map((u: string, idx: number) => (
                 <div key={idx} className="w-32">
-                  <img src={u} className="w-32 h-20 object-cover rounded" />
+                  <img
+                    src={`${api.API_BASE}${u}`}
+                    className="w-32 h-20 object-cover rounded"
+                  />
                 </div>
               ))}
             </div>
@@ -183,9 +290,9 @@ export default function EditWorkPage(props: any) {
           ) : null}
 
           <input
-            value={form.tags}
-            onChange={(e) => setForm({ ...form, tags: e.target.value })}
-            placeholder="tags (comma separated)"
+            value={form.tech}
+            onChange={(e) => setForm({ ...form, tech: e.target.value })}
+            placeholder="tech stack (comma separated)"
             className="border px-2 py-1 w-full"
           />
 

@@ -1,13 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AdminLoginClient from "../../components/AdminLoginClient";
-import Spinner from "../../components/Spinner";
+import * as api from "@/lib/api";
+import Spinner from "@/components/Spinner";
+import { toast } from "react-toastify";
 
 export default function AdminPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -56,6 +60,23 @@ export default function AdminPage() {
     };
   }, [router]);
 
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    const res = await api.authLogin(username, password);
+    if (!res.ok) {
+      toast.error(res.error || `Login failed (${res.status})`);
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Login successful");
+    // wait 2 seconds then redirect
+    setTimeout(() => {
+      router.push("/admin/dashboard");
+    }, 2000);
+  }
+
   return (
     <div className="min-h-screen px-6 py-20">
       <main className="mx-auto max-w-3xl">
@@ -72,7 +93,37 @@ export default function AdminPage() {
               </div>
             </div>
           ) : (
-            <AdminLoginClient />
+            <div className="max-w-md mx-auto py-12 px-6">
+              <h2 className="text-2xl font-bold mb-4">Admin login</h2>
+              <form onSubmit={submit} className="space-y-4">
+                <div>
+                  <label className="block text-sm">Username</label>
+                  <input
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="mt-1 block w-full rounded border px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm">Password</label>
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    type="password"
+                    className="mt-1 block w-full rounded border px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--apujo-blue)] text-white rounded"
+                  >
+                    {loginLoading ? <Spinner /> : null}
+                    <span>Sign in</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
         </div>
       </main>
