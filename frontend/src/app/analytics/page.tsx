@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { listAnalytic } from "../../lib/api";
+import { listAnalytic } from "@/lib/api";
 
 export default function AnalyticsPage() {
   const [items, setItems] = useState<any[]>([]);

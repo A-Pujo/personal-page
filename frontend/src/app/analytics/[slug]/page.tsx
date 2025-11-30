@@ -70,13 +70,13 @@ export default function AnalyticSlugPage({
       : item.file_url
     : "";
 
+  console.log(fileUrl);
+
   // Dynamically load react-pdf when needed
   useEffect(() => {
     // only run after we have an item and fileUrl
     if (!item || !fileUrl) return;
     if (item.file_type !== "application/pdf") return;
-
-    console.log(item);
 
     let mounted = true;
     setPDFFile(fileUrl);
