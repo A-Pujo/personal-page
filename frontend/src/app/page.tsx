@@ -62,7 +62,7 @@ export default async function Home() {
               </a>
               <a
                 href="/thoughts"
-                className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-zinc-200 dark:border-slate-800 dark:hover:bg-slate-800"
               >
                 Thoughts
               </a>
@@ -85,7 +85,7 @@ export default async function Home() {
               works.map((w: any) => (
                 <article
                   key={w.id}
-                  className="rounded-md border border-slate-100 p-4 bg-white"
+                  className="rounded-md border border-slate-100 p-4 bg-white dark:bg-slate-900 dark:border-slate-800"
                 >
                   <a
                     href={`/works/${w.slug}`}
@@ -96,7 +96,7 @@ export default async function Home() {
                   <p className="text-sm text-zinc-600 mt-2 line-clamp-3">
                     {decodeEntities(w.excerpt || w.description || "").replace(
                       /<[^>]+>/g,
-                      ""
+                      "",
                     )}
                   </p>
                   {w.year ? (
@@ -119,7 +119,7 @@ export default async function Home() {
               thoughts.map((t: any) => (
                 <article
                   key={t.id}
-                  className="rounded-md border border-slate-100 p-4 bg-white"
+                  className="rounded-md border border-slate-100 p-4 bg-white dark:bg-slate-900 dark:border-slate-800"
                 >
                   <a
                     href={`/thoughts/${t.slug}`}

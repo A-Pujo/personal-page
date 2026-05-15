@@ -30,8 +30,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} antialiased`}>
+        <script
+          // Initialize theme before React hydration to avoid flash
+          dangerouslySetInnerHTML={{
+            __html: `;(function(){try{var t=localStorage.getItem('theme');var m=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&m)){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){} })();`,
+          }}
+        />
         <Nav />
-        <main className="min-h-screen bg-zinc-50 dark:bg-black md:pl-28 p-6">
+        <main className="min-h-screen bg-zinc-50 dark:bg-zinc-900 md:pl-28 p-6">
           {children}
         </main>
         <ToastContainer position="bottom-right" />

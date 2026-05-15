@@ -56,13 +56,13 @@ export default function AnalyticsPage() {
           <button
             disabled={skip === 0}
             onClick={() => setSkip(Math.max(0, skip - limit))}
-            className="px-3 py-1 rounded bg-zinc-100"
+            className="px-3 py-1 rounded bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-200"
           >
             Previous
           </button>
           <button
             onClick={() => setSkip(skip + limit)}
-            className="px-3 py-1 rounded bg-zinc-100"
+            className="px-3 py-1 rounded bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-200"
           >
             Next
           </button>

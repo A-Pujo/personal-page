@@ -104,6 +104,15 @@ export default function About() {
           <div className="flex items-start gap-4">
             <Book className="w-5 h-5 text-zinc-600 dark:text-zinc-300 mt-1" />
             <div>
+              <p className="font-medium">University of Cyber Asia</p>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                Business (Management)
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <Book className="w-5 h-5 text-zinc-600 dark:text-zinc-300 mt-1" />
+            <div>
               <p className="font-medium">Polytechnic of State Finance STAN</p>
               <p className="text-sm text-zinc-700 dark:text-zinc-300">
                 Finance (Treasury)

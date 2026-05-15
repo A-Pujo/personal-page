@@ -46,7 +46,7 @@ export default function WorksPage() {
     );
 
   return (
-    <div className="min-h-screen px-6 py-20 bg-zinc-50">
+    <div className="min-h-screen px-6 py-20 bg-zinc-50 dark:bg-zinc-900">
       <main className="mx-auto max-w-5xl">
         <header className="mb-6">
           <h1 className="text-4xl font-extrabold">Works</h1>
@@ -62,7 +62,7 @@ export default function WorksPage() {
             return (
               <article
                 key={w.id}
-                className="rounded-lg border border-slate-100 p-4 bg-white flex flex-col md:flex-row gap-4 hover:shadow transition-shadow"
+                className="rounded-lg border border-slate-100 p-4 bg-white flex flex-col md:flex-row gap-4 hover:shadow transition-shadow dark:bg-slate-900 dark:border-slate-800"
               >
                 <div className="flex-shrink-0">
                   {img ? (
@@ -74,7 +74,7 @@ export default function WorksPage() {
                       />
                     </a>
                   ) : (
-                    <div className="w-48 h-32 bg-zinc-100 rounded-md flex items-center justify-center text-zinc-400">
+                    <div className="w-48 h-32 bg-zinc-100 rounded-md flex items-center justify-center text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400">
                       No image
                     </div>
                   )}

@@ -59,7 +59,7 @@ export default function Thoughts() {
 
   type Thought = any;
   return (
-    <div className="min-h-screen px-6 py-20 bg-zinc-50">
+    <div className="min-h-screen px-6 py-20 bg-zinc-50 dark:bg-zinc-900">
       <main className="mx-auto max-w-100vw">
         <header className="mb-8">
           <h1 className="text-4xl font-extrabold leading-tight mb-2">
@@ -74,7 +74,7 @@ export default function Thoughts() {
           <div>
             {lead ? (
               <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <article className="lg:col-span-2 bg-white rounded overflow-hidden border border-slate-100">
+                <article className="lg:col-span-2 bg-white rounded overflow-hidden border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
                   <a href={`/thoughts/${lead.slug}`} className="block">
                     {(() => {
                       const imgUrl = resolveImg(lead.featured_img || null);
@@ -85,7 +85,7 @@ export default function Thoughts() {
                           className="w-full h-64 object-cover"
                         />
                       ) : (
-                        <div className="w-full h-64 bg-zinc-100 flex items-center justify-center text-zinc-400">
+                        <div className="w-full h-64 bg-zinc-100 flex items-center justify-center text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400">
                           No image
                         </div>
                       );
@@ -106,7 +106,7 @@ export default function Thoughts() {
                     <a
                       key={t.id}
                       href={`/thoughts/${t.slug}`}
-                      className="flex gap-3 items-start bg-white p-3 rounded border border-slate-100 hover:shadow-sm"
+                      className="flex gap-3 items-start bg-white p-3 rounded border border-slate-100 hover:shadow-sm dark:bg-slate-900 dark:border-slate-800"
                     >
                       {(() => {
                         const u = resolveImg(t.featured_img || null);
@@ -116,7 +116,7 @@ export default function Thoughts() {
                             className="w-24 h-16 object-cover rounded"
                           />
                         ) : (
-                          <div className="w-24 h-16 bg-zinc-100 rounded" />
+                          <div className="w-24 h-16 bg-zinc-100 rounded dark:bg-zinc-800" />
                         );
                       })()}
                       <div>
@@ -138,14 +138,14 @@ export default function Thoughts() {
                 <a
                   key={t.id}
                   href={`/thoughts/${t.slug}`}
-                  className="block bg-white rounded overflow-hidden border border-slate-100 hover:shadow-sm"
+                  className="block bg-white rounded overflow-hidden border border-slate-100 hover:shadow-sm dark:bg-slate-900 dark:border-slate-800"
                 >
                   {(() => {
                     const uu = resolveImg(t.featured_img || null);
                     return uu ? (
                       <img src={uu} className="w-full h-40 object-cover" />
                     ) : (
-                      <div className="w-full h-40 bg-zinc-100" />
+                      <div className="w-full h-40 bg-zinc-100 dark:bg-zinc-800" />
                     );
                   })()}
                   <div className="p-4">

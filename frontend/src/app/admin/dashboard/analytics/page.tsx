@@ -46,7 +46,7 @@ export default function AdminAnalyticsPage() {
             <div className="flex items-center gap-2">
               <Link
                 href="/admin/dashboard/analytics/new"
-                className="px-3 py-1 border rounded bg-white"
+                className="px-3 py-1 border rounded bg-white dark:bg-slate-800 dark:border-slate-800 dark:text-zinc-200"
               >
                 New
               </Link>
