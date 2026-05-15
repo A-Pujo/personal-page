@@ -3,7 +3,10 @@ from fastapi.staticfiles import StaticFiles
 import os
 import logging
 from .routers import thoughts, works, auth, uploads, images, analytics
+from dotenv import load_dotenv
 
+# Load env from repo backend/.env.dev by default
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.dev"))
 
 app = FastAPI(title="A-Pujo Backend")
 
