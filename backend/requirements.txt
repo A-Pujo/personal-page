@@ -1,5 +1,6 @@
 fastapi
 uvicorn[standard]
+a2wsgi
 sqlalchemy>=1.4
 pymysql
 alembic

@@ -15,10 +15,23 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Allow CORS for local frontend during development
 # Allow CORS for local frontend during development and any configured origins
-allowed = os.getenv("ALLOWED_ORIGINS", "http://localhost:6565").split(",")
+# Normalize configured origins (strip whitespace and trailing slash) so entries
+# like "https://a-pujo.my.id/" match the browser's Origin header which is
+# sent without a trailing slash ("https://a-pujo.my.id").
+raw_allowed = os.getenv("ALLOWED_ORIGINS", "http://localhost:6565")
+allowed = []
+for part in raw_allowed.split(","):
+    p = part.strip()
+    if not p:
+        continue
+    # Remove any trailing slash for normalization
+    p = p.rstrip("/")
+    allowed.append(p)
+
+logger.info("CORS allowed origins: %s", allowed)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in allowed if o.strip()],
+    allow_origins=allowed,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

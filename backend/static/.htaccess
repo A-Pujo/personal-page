@@ -1,0 +1,13 @@
+<IfModule mod_headers.c>
+  # Allow cross-origin requests from the frontend origin for static assets
+  <FilesMatch "\.(ipynb|json|pdf|html|js|css|png|jpe?g|gif|svg)$">
+    Header set Access-Control-Allow-Origin "https://a-pujo.my.id"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
+  </FilesMatch>
+</IfModule>
+
+# Fallback: set header for everything in this folder if FilesMatch isn't supported
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "https://a-pujo.my.id"
+</IfModule>

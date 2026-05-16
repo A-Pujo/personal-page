@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-heading: "Playfair Display", serif;
+  --color-apujo-red: #c1121f;
+  --color-apujo-blue: #003f88;
+  --color-apujo-green: #1d6a3a;
+  --color-apujo-amber: #b45309;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --apujo-red: #c1121f;
+  --apujo-blue: #003f88;
+  --apujo-green: #1d6a3a;
+  --apujo-amber: #b45309;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.dark):not(.light) {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-heading);
+}

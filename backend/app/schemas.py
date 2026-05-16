@@ -21,6 +21,7 @@ class ThoughtUpdate(BaseModel):
     title: Optional[str] = None
     excerpt: Optional[str] = None
     content: Optional[str] = None
+    featured_img: Optional[str] = None
     tags: Optional[List[str]] = None
     published: Optional[bool] = None
 
