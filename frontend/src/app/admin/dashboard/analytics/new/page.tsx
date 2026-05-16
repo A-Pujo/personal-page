@@ -42,7 +42,7 @@ export default function CreateAnalyticPage() {
       // require file upload (backend expects file for analytics)
       const fcheck = fileRef.current?.files?.[0];
       if (!fcheck) {
-        toast.error("Please select a file (PDF or .ipynb)");
+        toast.error("Please select a file (PDF, .ipynb, or .html)");
         setLoading(false);
         return;
       }
@@ -133,7 +133,7 @@ export default function CreateAnalyticPage() {
             <input
               ref={fileRef}
               type="file"
-              accept=".pdf,.ipynb,application/pdf,application/json"
+              accept=".pdf,.ipynb,.html,application/pdf,application/json,text/html"
             />
           </div>
           <div>

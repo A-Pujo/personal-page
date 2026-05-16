@@ -9,6 +9,8 @@
   --foreground: #171717;
   --apujo-red: #c1121f;
   --apujo-blue: #003f88;
+  --apujo-green: #1d6a3a;
+  --apujo-amber: #b45309;
   --font-inter: var(--font-inter);
   --font-playfair: var(--font-playfair);
 }

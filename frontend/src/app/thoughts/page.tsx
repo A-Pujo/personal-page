@@ -5,22 +5,30 @@ import * as api from "@/lib/api";
 import Spinner from "@/components/Spinner";
 import { toast } from "react-toastify";
 
+function readingTime(text: string) {
+  const words = text.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 export default function Thoughts() {
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<Thought[]>([]);
-  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const pageSize = 8;
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
     api
-      .listThoughts(page * pageSize, pageSize)
+      .listThoughts(0, pageSize)
       .then((res) => {
         if (!mounted) return;
         if (res.ok) {
-          setItems((res as any).data);
+          const data = (res as any).data;
+          setItems(data);
+          setHasMore(data.length === pageSize);
         } else {
           setError(res.error || `API error ${res.status}`);
           toast.error(res.error || `API error ${res.status}`);
@@ -36,7 +44,22 @@ export default function Thoughts() {
     return () => {
       mounted = false;
     };
-  }, [page]);
+  }, []);
+
+  function loadMore() {
+    setLoadingMore(true);
+    api
+      .listThoughts(items.length, pageSize)
+      .then((res) => {
+        if (res.ok) {
+          const data = (res as any).data;
+          setItems((prev) => [...prev, ...data]);
+          setHasMore(data.length === pageSize);
+        }
+        setLoadingMore(false);
+      })
+      .catch(() => setLoadingMore(false));
+  }
 
   if (loading)
     return (
@@ -60,7 +83,7 @@ export default function Thoughts() {
   type Thought = any;
   return (
     <div className="min-h-screen px-6 py-20 bg-zinc-50 dark:bg-zinc-900">
-      <main className="mx-auto max-w-100vw">
+      <main className="mx-auto max-w-7xl">
         <header className="mb-8">
           <h1 className="text-4xl font-extrabold leading-tight mb-2">
             Thoughts
@@ -82,21 +105,26 @@ export default function Thoughts() {
                         <img
                           src={imgUrl}
                           alt={lead.title}
-                          className="w-full h-64 object-cover"
+                          className="w-full aspect-video object-cover"
                         />
                       ) : (
-                        <div className="w-full h-64 bg-zinc-100 flex items-center justify-center text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400">
+                        <div className="w-full aspect-video bg-zinc-100 flex items-center justify-center text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400">
                           No image
                         </div>
                       );
                     })()}
                     <div className="p-6">
-                      <h2 className="text-2xl font-bold text-zinc-900 hover:text-[var(--apujo-blue)]">
+                      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 hover:text-[var(--apujo-blue)] transition-colors">
                         {lead.title}
                       </h2>
                       <p className="text-sm text-zinc-500 mt-2 line-clamp-4">
                         {lead.excerpt}
                       </p>
+                      {lead.excerpt && (
+                        <span className="mt-3 inline-block text-xs text-zinc-400">
+                          {readingTime(lead.excerpt)} min read
+                        </span>
+                      )}
                     </div>
                   </a>
                 </article>
@@ -120,7 +148,7 @@ export default function Thoughts() {
                         );
                       })()}
                       <div>
-                        <h3 className="text-lg font-medium text-zinc-900">
+                        <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-50 hover:text-[var(--apujo-blue)] transition-colors">
                           {t.title}
                         </h3>
                         <p className="text-xs text-zinc-500 line-clamp-3">
@@ -150,31 +178,30 @@ export default function Thoughts() {
                   })()}
                   <div className="p-4">
                     <h3 className="font-semibold text-zinc-900">{t.title}</h3>
-                    <p className="text-sm text-zinc-600 mt-1 line-clamp-3">
+                    <p className="text-sm text-zinc-600 mt-1 line-clamp-2">
                       {t.excerpt}
                     </p>
+                    {t.excerpt && (
+                      <span className="mt-2 inline-block text-xs text-zinc-400">
+                        {readingTime(t.excerpt)} min read
+                      </span>
+                    )}
                   </div>
                 </a>
               ))}
             </section>
 
-            <div className="flex items-center justify-center gap-4 mt-6">
-              <button
-                className="px-3 py-1 border rounded disabled:opacity-50"
-                disabled={page === 0}
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-              >
-                Prev
-              </button>
-              <div className="text-sm">Page {page + 1}</div>
-              <button
-                className="px-3 py-1 border rounded disabled:opacity-50"
-                disabled={items.length < pageSize}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </button>
-            </div>
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button
+                  className="px-5 py-2 rounded-md bg-zinc-100 dark:bg-zinc-800 text-sm font-medium disabled:opacity-50 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                  disabled={loadingMore}
+                  onClick={loadMore}
+                >
+                  {loadingMore ? "Loading…" : "Load more"}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </main>

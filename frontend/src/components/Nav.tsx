@@ -65,25 +65,35 @@ export default function Nav() {
       <nav
         role="navigation"
         aria-label="Primary"
-        className="hidden md:fixed md:inset-y-0 md:left-0 md:w-20 md:flex md:flex-col md:items-center md:py-6 md:gap-4 bg-white/70 backdrop-blur-md border-r border-slate-100/60 dark:bg-slate-900/60 dark:border-slate-800/60"
+        className="hidden md:fixed md:inset-y-0 md:left-0 md:w-20 md:flex md:flex-col md:items-center md:py-6 md:gap-1 bg-white/70 backdrop-blur-md border-r border-slate-100/60 dark:bg-slate-900/60 dark:border-slate-800/60"
       >
         {links.map((l) => {
           const active = pathname === l.href;
           return (
-            <Link
+            <div
               key={l.href}
-              href={l.href}
-              aria-label={l.label}
-              title={l.label}
-              aria-current={active ? "page" : undefined}
-              className={`flex items-center justify-center w-10 h-10 rounded-md text-slate-700 dark:text-zinc-200 transition-all duration-150 ease-in-out transform ${
-                active
-                  ? "bg-[var(--apujo-blue)] text-white shadow-sm bg-opacity-10"
-                  : "hover:bg-[var(--apujo-red)] hover:bg-opacity-10 hover:text-white hover:-translate-y-0.5"
-              }`}
+              className="group relative w-full flex items-center justify-center py-1"
             >
-              <l.Icon className="w-5 h-5" aria-hidden="true" />
-            </Link>
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-[3px] bg-[var(--apujo-blue)] rounded-r" />
+              )}
+              <Link
+                href={l.href}
+                aria-label={l.label}
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 ease-out ${
+                  active
+                    ? "bg-[var(--apujo-blue)] text-white shadow-md scale-100"
+                    : "text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--apujo-blue)]"
+                }`}
+              >
+                <l.Icon className="w-5 h-5" aria-hidden="true" />
+              </Link>
+              {/* Floating tooltip label */}
+              <span className="pointer-events-none absolute left-14 z-50 whitespace-nowrap rounded-md bg-slate-900 dark:bg-slate-700 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm">
+                {l.label}
+              </span>
+            </div>
           );
         })}
         {/* theme toggle */}
@@ -91,7 +101,7 @@ export default function Nav() {
           aria-label="Toggle theme"
           title="Toggle theme"
           onClick={toggleTheme}
-          className="mt-auto mb-2 flex items-center justify-center w-10 h-10 rounded-md text-slate-700 dark:text-zinc-200 transition-all duration-150 ease-in-out hover:bg-slate-200 dark:hover:bg-slate-700"
+          className="mt-auto mb-2 flex items-center justify-center w-10 h-10 rounded-md text-slate-700 dark:text-zinc-200 transition-all duration-200 ease-out hover:bg-slate-100 dark:hover:bg-slate-700"
         >
           {theme === "dark" ? (
             <Sun className="w-5 h-5" />
@@ -106,40 +116,41 @@ export default function Nav() {
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 md:hidden"
         aria-label="Mobile"
       >
-        <div className="flex items-center justify-center w-auto h-16 rounded-full bg-white/95 shadow-lg border border-slate-200 dark:bg-slate-900/95 dark:border-slate-800">
-          <div className="flex gap-4 px-2 items-center">
-            {links.map((l) => {
-              const active = pathname === l.href;
-              return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  aria-label={l.label}
-                  title={l.label}
-                  aria-current={active ? "page" : undefined}
-                  className={`flex items-center justify-center w-10 h-10 rounded-full text-slate-700 dark:text-zinc-200 transition-colors duration-150 ${
-                    active
-                      ? "bg-[var(--apujo-blue)] text-white bg-opacity-10"
-                      : "hover:bg-[var(--apujo-red)] hover:bg-opacity-10 hover:text-white"
-                  }`}
-                >
-                  <l.Icon className="w-5 h-5" aria-hidden="true" />
-                </Link>
-              );
-            })}
-            <button
-              aria-label="Toggle theme"
-              title="Toggle theme"
-              onClick={toggleTheme}
-              className="flex items-center justify-center w-10 h-10 rounded-full text-slate-700 dark:text-zinc-200 transition-colors duration-150 hover:bg-slate-200 dark:hover:bg-slate-700"
-            >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+        <div className="flex items-end justify-center gap-1 px-3 py-2 rounded-2xl bg-white/95 shadow-lg border border-slate-200 dark:bg-slate-900/95 dark:border-slate-800">
+          {links.map((l) => {
+            const active = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-label={l.label}
+                aria-current={active ? "page" : undefined}
+                className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-200 ease-out ${
+                  active
+                    ? "bg-[var(--apujo-blue)] text-white shadow-sm"
+                    : "text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--apujo-blue)]"
+                }`}
+              >
+                <l.Icon className="w-5 h-5" aria-hidden="true" />
+                <span className="text-[10px] leading-none font-medium">
+                  {l.label}
+                </span>
+              </Link>
+            );
+          })}
+          <button
+            aria-label="Toggle theme"
+            title="Toggle theme"
+            onClick={toggleTheme}
+            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-500 dark:text-zinc-400 transition-all duration-200 ease-out hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            {theme === "dark" ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+            <span className="text-[10px] leading-none font-medium">Theme</span>
+          </button>
         </div>
       </nav>
     </>

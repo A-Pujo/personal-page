@@ -37,7 +37,7 @@ export default function RootLayout({
           }}
         />
         <Nav />
-        <main className="min-h-screen bg-zinc-50 dark:bg-zinc-900 md:pl-28 p-6">
+        <main className="min-h-screen bg-zinc-50 dark:bg-zinc-900 md:px-12 p-6 pb-24 md:pb-6">
           {children}
         </main>
         <ToastContainer position="bottom-right" />

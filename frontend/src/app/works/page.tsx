@@ -55,49 +55,49 @@ export default function WorksPage() {
           </p>
         </header>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((w) => {
             const img =
               w.images && w.images.length > 0 ? resolveImg(w.images[0]) : null;
             return (
               <article
                 key={w.id}
-                className="rounded-lg border border-slate-100 p-4 bg-white flex flex-col md:flex-row gap-4 hover:shadow transition-shadow dark:bg-slate-900 dark:border-slate-800"
+                className="group rounded-lg border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden flex flex-col hover:ring-2 hover:ring-[var(--apujo-blue)] hover:scale-[1.01] transition-all duration-200"
               >
-                <div className="flex-shrink-0">
+                <a href={`/works/${w.slug || ""}`} className="block">
                   {img ? (
-                    <a href={`/works/${w.slug || ""}`} className="block">
-                      <img
-                        src={img}
-                        alt={w.title}
-                        className="w-48 h-32 object-cover rounded-md"
-                      />
-                    </a>
+                    <img
+                      src={img}
+                      alt={w.title}
+                      className="w-full aspect-video object-cover"
+                    />
                   ) : (
-                    <div className="w-48 h-32 bg-zinc-100 rounded-md flex items-center justify-center text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400">
+                    <div className="w-full aspect-video bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 text-sm">
                       No image
                     </div>
                   )}
-                </div>
-                <div className="flex-1">
+                </a>
+                <div className="flex flex-col flex-1 p-4">
                   <a
                     href={`/works/${w.slug || ""}`}
-                    className="text-2xl font-semibold hover:underline"
+                    className="font-semibold text-base hover:text-[var(--apujo-blue)] transition-colors line-clamp-2"
                   >
                     {w.title}
                   </a>
-                  <p className="text-sm text-zinc-600 mt-2 line-clamp-4">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-3 flex-1">
                     {w.excerpt}
                   </p>
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-4 flex items-center justify-between">
                     {w.year ? (
                       <span className="text-xs text-zinc-500">{w.year}</span>
-                    ) : null}
+                    ) : (
+                      <span />
+                    )}
                     <a
                       href={`/works/${w.slug || ""}`}
-                      className="text-sm text-blue-600"
+                      className="inline-flex items-center gap-1 text-xs font-medium bg-[var(--apujo-blue)] text-white rounded-md px-3 py-1 hover:bg-[#002f6f] transition-colors"
                     >
-                      View project →
+                      View →
                     </a>
                   </div>
                 </div>
