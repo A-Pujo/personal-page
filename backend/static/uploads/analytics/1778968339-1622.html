@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Principal Component Analysis (PCA)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background-color: #f7fafc;
+        }
+        .math-block {
+            overflow-x: auto;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #4a90e2;
+        }
+        .step-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .step-number {
+            background: #4a90e2;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 lg:p-12">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Principal Component Analysis (PCA)</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">A mathematical journey from high-dimensional data to its most essential components.</p>
+        </header>
+
+        <section class="mb-12 bg-blue-50 border-l-8 border-blue-500 p-6 rounded-r-lg">
+            <h2 class="text-2xl font-bold mb-3 text-blue-900">What is PCA?</h2>
+            <p class="text-gray-700">
+                Principal Component Analysis (PCA) is a dimensionality-reduction technique that transforms a large set of variables into a smaller one that still contains most of the information in the large set. It identifies the "principal components"—the directions where there is the most <strong>variance</strong> in the data.
+            </p>
+        </section>
+
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h2 class="text-2xl font-bold mb-4">Standardization</h2>
+            <p class="mb-4">
+                The purpose of this step is to standardize the range of the continuous initial variables so that each of them contributes equally to the analysis. If one variable has a much larger range than another, it might dominate the results.
+            </p>
+            <p>For each feature $j$ and data point $i$, we calculate the Z-score:</p>
+            <div class="math-block">
+                $$z = \frac{x_{ij} - \mu_j}{\sigma_j}$$
+            </div>
+            <p class="text-sm text-gray-500 italic">
+                Where $\mu_j$ is the mean of feature $j$ and $\sigma_j$ is the standard deviation.
+            </p>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h2 class="text-2xl font-bold mb-4">Covariance Matrix Computation</h2>
+            <p class="mb-4">
+                The covariance matrix is a $p \times p$ symmetric matrix (where $p$ is the number of dimensions) that has as entries the covariances associated with all possible pairs of the initial variables.
+            </p>
+            <div class="math-block">
+                $$\text{Cov}(X, Y) = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})$$
+            </div>
+            <p>The resulting matrix $\Sigma$ looks like this:</p>
+            <div class="math-block">
+                $$\Sigma = \begin{pmatrix} 
+                \text{Var}(X_1) & \text{Cov}(X_1, X_2) & \dots \\
+                \text{Cov}(X_2, X_1) & \text{Var}(X_2) & \dots \\
+                \vdots & \vdots & \ddots 
+                \end{pmatrix}$$
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h2 class="text-2xl font-bold mb-4">Compute Eigenvectors & Eigenvalues</h2>
+            <p class="mb-4">
+                Eigenvectors and eigenvalues are the linear algebra concepts we need to determine from the covariance matrix in order to determine the <strong>principal components</strong> of the data.
+            </p>
+            <ul class="list-disc ml-6 mb-4 space-y-2">
+                <li><strong>Eigenvectors</strong> determine the directions of the new feature space.</li>
+                <li><strong>Eigenvalues</strong> determine their magnitude (how much variance is explained by that component).</li>
+            </ul>
+            <p>We solve the characteristic equation:</p>
+            <div class="math-block">
+                $$\det(\Sigma - \lambda I) = 0$$
+            </div>
+            <p>Then find the corresponding eigenvectors $v$ for each eigenvalue $\lambda$:</p>
+            <div class="math-block">
+                $$\Sigma v = \lambda v$$
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <h2 class="text-2xl font-bold mb-4">Feature Vector Creation</h2>
+            <p class="mb-4">
+                In this step, we choose whether to keep all the components or discard those of lesser importance (low eigenvalues). We sort eigenvalues in descending order:
+            </p>
+            <div class="math-block">
+                $$\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_p$$
+            </div>
+            <p>We then form a <strong>Feature Vector</strong> (matrix of vectors) by taking the eigenvectors we want to keep ($k$ dimensions):</p>
+            <div class="math-block">
+                $$W = [v_1, v_2, \dots, v_k]$$
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <h2 class="text-2xl font-bold mb-4">Recast Data Along Principal Components</h2>
+            <p class="mb-4">
+                The final step is to use the feature vector $W$ to reorient the data from the original axes to the ones represented by the principal components.
+            </p>
+            <div class="math-block">
+                $$Y = X_{standardized} \times W$$
+            </div>
+            <p>
+                Where $Y$ is the new reduced dataset, $X_{standardized}$ is our initial standardized data, and $W$ is our matrix of selected eigenvectors.
+            </p>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 border-t pt-8">
+            <p class="mb-2 font-semibold">PCA Summary</p>
+            <p>Data → Standardize → Covariance Matrix → Eigenvalues/vectors → Sort → Project</p>
+            <p class="mt-4 text-xs">Educational Reference Document &copy; 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        function renderMath() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError : false
+            });
+        }
+    </script>
+</body>
+</html>

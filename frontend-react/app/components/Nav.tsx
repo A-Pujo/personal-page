@@ -64,7 +64,10 @@ export default function Nav() {
         className="hidden md:fixed md:inset-y-0 md:left-0 md:w-20 md:flex md:flex-col md:items-center md:py-6 md:gap-1 bg-white/70 backdrop-blur-md border-r border-slate-100/60 dark:bg-slate-900/60 dark:border-slate-800/60"
       >
         {links.map((l) => {
-          const active = pathname === l.to;
+          const isRoot = l.to === "/";
+          const active = isRoot
+            ? pathname === "/"
+            : pathname === l.to || pathname.startsWith(l.to + "/");
           return (
             <div
               key={l.to}
@@ -113,7 +116,10 @@ export default function Nav() {
           {links
             .filter((l) => l.to !== "/admin")
             .map((l) => {
-              const active = pathname === l.to;
+              const isRoot = l.to === "/";
+              const active = isRoot
+                ? pathname === "/"
+                : pathname === l.to || pathname.startsWith(l.to + "/");
               return (
                 <Link
                   key={l.to}

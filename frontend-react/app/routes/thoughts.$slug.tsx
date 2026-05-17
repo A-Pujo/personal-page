@@ -106,7 +106,7 @@ export default function ThoughtDetail() {
         />
       )}
       <div
-        className="prose mt-6 text-black dark:text-zinc-50"
+        className="prose mt-6 dark:prose-invert"
         dangerouslySetInnerHTML={{
           __html: normalizeLists(decodeEntities(thought.content || "")),
         }}

@@ -1,4 +1,4 @@
-import { Mail, MapPin, Github, Linkedin } from "lucide-react";
+import { Mail, MapPin, Github, Linkedin, Book } from "lucide-react";
 
 export default function About() {
   const fullName = "Aln Pujo Priambodo";
@@ -160,7 +160,7 @@ export default function About() {
           </h2>
           <div className="flex flex-wrap gap-3 mb-4">
             <a
-              href="https://github.com/apujo"
+              href="https://github.com/a-pujo"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-200 dark:border-slate-700 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
@@ -168,12 +168,20 @@ export default function About() {
               <Github className="w-4 h-4" /> GitHub
             </a>
             <a
-              href="https://linkedin.com/in/apujo"
+              href="https://www.linkedin.com/in/aln-pujo-priambodo-22b312170/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-200 dark:border-slate-700 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <Linkedin className="w-4 h-4" /> LinkedIn
+            </a>
+            <a
+              href="https://scholar.google.com/citations?user=DXFiyI4AAAAJ"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-200 dark:border-slate-700 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Book className="w-4 h-4" /> Google Scholar
             </a>
           </div>
           <div className="flex items-center gap-3">
