@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
 import { decode } from "html-entities";
 import {
@@ -9,12 +9,7 @@ import {
 } from "~/lib/api";
 import { toast } from "react-toastify";
 import Spinner from "~/components/Spinner";
-
-declare global {
-  interface Window {
-    tinymce: any;
-  }
-}
+import MarkdownKatexEditor from "~/components/MarkdownKatexEditor";
 
 type Work = {
   id: number;
@@ -30,10 +25,9 @@ type Work = {
 export default function EditWork() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const editorRef = useRef<any>(null);
-  const formRef = useRef<any>(null);
   const [work, setWork] = useState<Work | null>(null);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [year, setYear] = useState("");
   const [tags, setTags] = useState("");
   const [images, setImages] = useState<string[]>([]);
@@ -41,7 +35,6 @@ export default function EditWork() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const editorId = `tinymce-edit-work-${slug}`;
 
   useEffect(() => {
     if (!localStorage.getItem("apujo_token"))
@@ -53,9 +46,9 @@ export default function EditWork() {
     getWork(slug).then((res) => {
       if (res.ok) {
         const d = res.data as Work;
-        const decoded = { ...d, description: decode(d.description || "") };
-        setWork(decoded);
+        setWork(d);
         setTitle(d.title);
+        setDescription(decode(d.description || ""));
         setYear(d.year || "");
         setTags((d.tags || []).join(", "));
         const imgs = (d.images || []).map((img) =>
@@ -69,63 +62,6 @@ export default function EditWork() {
       setLoading(false);
     });
   }, [slug]);
-
-  useEffect(() => {
-    formRef.current = { description: work?.description || "" };
-  }, [work]);
-
-  useEffect(() => {
-    if (!work) return;
-    let mounted = true;
-    async function ensure() {
-      if (typeof window.tinymce === "undefined") {
-        await new Promise<void>((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = "/js/tinymce/tinymce.min.js";
-          s.onload = () => resolve();
-          s.onerror = () => reject(new Error("Failed to load tinymce"));
-          document.head.appendChild(s);
-        });
-      }
-      if (!mounted) return;
-      window.tinymce.init({
-        license_key: "gpl",
-        selector: `#${editorId}`,
-        menubar: false,
-        plugins: ["link", "lists", "code", "image", "autoresize"],
-        toolbar:
-          "undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code",
-        images_upload_handler: async (
-          blobInfo: any,
-          success: any,
-          failure: any,
-        ) => {
-          const res = await uploadImageWithCategory(
-            blobInfo.blob() as File,
-            "works",
-          );
-          if (res.ok) success(res.data.url);
-          else failure("Upload failed");
-        },
-        setup(editor: any) {
-          editorRef.current = editor;
-        },
-        init_instance_callback(editor: any) {
-          editor.setContent(formRef.current?.description || "");
-        },
-      });
-    }
-    ensure();
-    return () => {
-      mounted = false;
-      try {
-        if (editorRef.current) {
-          editorRef.current.destroy();
-          editorRef.current = null;
-        }
-      } catch {}
-    };
-  }, [work]);
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -148,7 +84,6 @@ export default function EditWork() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!slug) return;
-    const description = window.tinymce?.get(editorId)?.getContent() || "";
     if (!title) {
       toast.error("Title is required.");
       return;
@@ -277,7 +212,7 @@ export default function EditWork() {
 
         <div>
           <label className="block text-sm font-medium mb-2">Description</label>
-          <textarea id={editorId} defaultValue="" />
+          <MarkdownKatexEditor value={description} onChange={setDescription} />
         </div>
 
         <label className="flex items-center gap-2 text-sm">

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
-import { decode } from "html-entities";
 import Spinner from "~/components/Spinner";
-
+import { useMarkdownRenderer } from "~/components/useMarkdownRenderer";
 import { API_BASE } from "~/lib/api";
 
 type Work = {
@@ -22,20 +21,9 @@ function resolveImg(p?: string | null) {
   return `${API_BASE}${p}`;
 }
 
-function decodeEntities(s: string) {
-  try {
-    let out = decode(s || "");
-    if (out.includes("&lt;") || out.includes("&gt;") || out.includes("&amp;")) {
-      out = decode(out);
-    }
-    return out;
-  } catch {
-    return s || "";
-  }
-}
-
 export default function WorkDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const { render } = useMarkdownRenderer();
   const [work, setWork] = useState<Work | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -164,7 +152,7 @@ export default function WorkDetail() {
         <div
           className="prose prose-zinc dark:prose-invert max-w-none"
           dangerouslySetInnerHTML={{
-            __html: decodeEntities(work.description || ""),
+            __html: render(work.description || ""),
           }}
         />
 

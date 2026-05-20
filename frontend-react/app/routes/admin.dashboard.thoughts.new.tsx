@@ -1,13 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { createThought, uploadImageWithCategory } from "~/lib/api";
 import { toast } from "react-toastify";
-
-declare global {
-  interface Window {
-    tinymce: any;
-  }
-}
+import MarkdownKatexEditor from "~/components/MarkdownKatexEditor";
 
 function slugify(text: string) {
   return text
@@ -20,56 +15,21 @@ function slugify(text: string) {
 
 export default function NewThought() {
   const navigate = useNavigate();
-  const editorRef = useRef<HTMLTextAreaElement>(null);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [published, setPublished] = useState(false);
   const [slugEdited, setSlugEdited] = useState(false);
   const [saving, setSaving] = useState(false);
-  const editorId = "tinymce-new-thought";
 
   useEffect(() => {
     if (!localStorage.getItem("apujo_token"))
       navigate("/admin", { replace: true });
   }, [navigate]);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "/js/tinymce/tinymce.min.js";
-    script.onload = () => {
-      if (!window.tinymce) return;
-      window.tinymce.init({
-        license_key: "gpl",
-        selector: `#${editorId}`,
-        plugins: "lists link image code codesample autolink autoresize",
-        toolbar:
-          "undo redo | bold italic underline | bullist numlist | link image | codesample code",
-        height: 500,
-        base_url: "/js/tinymce",
-        images_upload_handler: async (
-          blobInfo: any,
-          success: any,
-          failure: any,
-        ) => {
-          const res = await uploadImageWithCategory(
-            blobInfo.blob() as File,
-            "thoughts",
-          );
-          if (res.ok) success(res.data.url);
-          else failure("Upload failed");
-        },
-      });
-    };
-    document.head.appendChild(script);
-    return () => {
-      window.tinymce?.get(editorId)?.destroy();
-      script.remove();
-    };
-  }, []);
 
   useEffect(() => {
     if (!slugEdited) {
@@ -81,7 +41,6 @@ export default function NewThought() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const content = window.tinymce?.get(editorId)?.getContent() || "";
     if (!title || !content) {
       toast.error("Title and content are required.");
       return;
@@ -168,7 +127,7 @@ export default function NewThought() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Body</label>
-          <textarea id={editorId} ref={editorRef} defaultValue="" />
+          <MarkdownKatexEditor value={content} onChange={setContent} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">

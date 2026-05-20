@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
 import {
   getThought,
@@ -9,12 +9,7 @@ import {
 import { decode } from "html-entities";
 import { toast } from "react-toastify";
 import Spinner from "~/components/Spinner";
-
-declare global {
-  interface Window {
-    tinymce: any;
-  }
-}
+import MarkdownKatexEditor from "~/components/MarkdownKatexEditor";
 
 type Thought = {
   id: number;
@@ -36,10 +31,9 @@ function resolveImg(p?: string | null) {
 export default function EditThought() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const editorRef = useRef<any>(null);
-  const formRef = useRef<any>(null);
   const [thought, setThought] = useState<Thought | null>(null);
   const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [excerptVal, setExcerptVal] = useState("");
   const [tags, setTags] = useState("");
   const [published, setPublished] = useState(false);
@@ -48,7 +42,6 @@ export default function EditThought() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const editorId = `tinymce-edit-thought-${slug}`;
 
   useEffect(() => {
     if (!localStorage.getItem("apujo_token"))
@@ -60,9 +53,9 @@ export default function EditThought() {
     getThought(slug).then((res) => {
       if (res.ok) {
         const d = res.data as Thought;
-        const decoded = { ...d, content: decode(d.content || "") };
-        setThought(decoded);
+        setThought(d);
         setTitle(d.title);
+        setContent(decode(d.content || ""));
         setExcerptVal(d.excerpt || "");
         setPublished(!!d.published);
         setTags((d.tags || []).join(", "));
@@ -74,70 +67,9 @@ export default function EditThought() {
     });
   }, [slug]);
 
-  useEffect(() => {
-    formRef.current = { content: thought?.content || "" };
-  }, [thought]);
-
-  useEffect(() => {
-    if (!thought) return;
-    let mounted = true;
-    async function ensure() {
-      if (typeof window.tinymce === "undefined") {
-        await new Promise<void>((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = "/js/tinymce/tinymce.min.js";
-          s.onload = () => resolve();
-          s.onerror = () => reject(new Error("Failed to load tinymce"));
-          document.head.appendChild(s);
-        });
-      }
-      if (!mounted) return;
-      window.tinymce.init({
-        license_key: "gpl",
-        selector: `#${editorId}`,
-        menubar: false,
-        plugins: ["link", "lists", "code", "image", "autoresize"],
-        toolbar:
-          "undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code",
-        images_upload_handler: async (
-          blobInfo: any,
-          success: any,
-          failure: any,
-        ) => {
-          const res = await uploadImageWithCategory(
-            blobInfo.blob() as File,
-            "thoughts",
-          );
-          if (res.ok) success(res.data.url);
-          else failure("Upload failed");
-        },
-        setup(editor: any) {
-          editorRef.current = editor;
-        },
-        init_instance_callback(editor: any) {
-          editor.setContent(formRef.current?.content || "");
-        },
-      });
-    }
-    ensure();
-    return () => {
-      mounted = false;
-      try {
-        if (editorRef.current) {
-          editorRef.current.destroy();
-          editorRef.current = null;
-        }
-      } catch {}
-    };
-  }, [thought]);
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!slug) return;
-    const content =
-      editorRef.current?.getContent?.() ??
-      window.tinymce?.get(editorId)?.getContent() ??
-      "";
     if (!title || !content) {
       toast.error("Title and content are required.");
       return;
@@ -226,7 +158,7 @@ export default function EditThought() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Body</label>
-          <textarea id={editorId} defaultValue="" />
+          <MarkdownKatexEditor value={content} onChange={setContent} />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">

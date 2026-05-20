@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router";
 import { decode } from "html-entities";
 import { API_BASE } from "~/lib/api";
 import Spinner from "~/components/Spinner";
+import { useMarkdownRenderer } from "~/components/useMarkdownRenderer";
 
 type Thought = {
   id: number;
@@ -19,9 +20,10 @@ function resolveImg(p?: string | null) {
   return `${API_BASE}${p}`;
 }
 
-function decodeEntities(s: string) {
+function decodeContent(s: string) {
   try {
     let out = decode(s || "");
+    // Handle doubly-encoded entities from legacy TinyMCE posts
     if (out.includes("&lt;") || out.includes("&gt;") || out.includes("&amp;")) {
       out = decode(out);
     }
@@ -31,28 +33,9 @@ function decodeEntities(s: string) {
   }
 }
 
-function normalizeLists(html: string): string {
-  if (!html) return html;
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    doc.querySelectorAll("ul").forEach((ul) => {
-      if (!ul.classList.contains("list-disc")) ul.classList.add("list-disc");
-      if (!ul.classList.contains("pl-6")) ul.classList.add("pl-6");
-    });
-    doc.querySelectorAll("ol").forEach((ol) => {
-      if (!ol.classList.contains("list-decimal"))
-        ol.classList.add("list-decimal");
-      if (!ol.classList.contains("pl-6")) ol.classList.add("pl-6");
-    });
-    return doc.body.innerHTML;
-  } catch {
-    return html;
-  }
-}
-
 export default function ThoughtDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const { render } = useMarkdownRenderer();
   const [thought, setThought] = useState<Thought | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -106,9 +89,9 @@ export default function ThoughtDetail() {
         />
       )}
       <div
-        className="prose mt-6 dark:prose-invert"
+        className="prose mt-6 dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{
-          __html: normalizeLists(decodeEntities(thought.content || "")),
+          __html: render(decodeContent(thought.content || "")),
         }}
       />
     </div>
