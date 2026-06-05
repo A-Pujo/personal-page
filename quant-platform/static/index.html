@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pujo Research Platform</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+
+  <body>
+    <!-- ═══════════════════════════════════════════════════════════ Header -->
+    <header>
+      <div class="logo">
+        <div class="logo-icon">∑</div>
+        <h1>Pujo Research Platform</h1>
+      </div>
+      <nav>
+        <button class="tab-btn active" data-tab="mpt">
+          MPT Portfolio <span class="badge">Markowitz</span>
+        </button>
+        <button class="tab-btn" data-tab="factor">
+          Factor Analysis <span class="badge">FF3</span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ══════════════════════════════════════════════════ MPT Tab -->
+      <section id="tab-mpt" class="tab-content active">
+        <aside class="sidebar">
+          <h2>Configuration</h2>
+
+          <div class="form-group">
+            <label>Asset Selection <span class="hint">(min 2)</span></label>
+            <div id="mpt-asset-list" class="asset-list">
+              <div class="loading-placeholder">Loading assets…</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Target Annual Return (%)</label>
+            <input
+              type="number"
+              id="target-return"
+              min="-50"
+              max="200"
+              step="0.5"
+              placeholder="Leave blank → Min-Variance"
+            />
+            <p class="input-hint">
+              Optional. Blank = Global Minimum-Variance Portfolio.
+            </p>
+          </div>
+
+          <div id="mpt-alert" class="alert" role="alert"></div>
+
+          <button id="optimize-btn" class="btn btn-primary">
+            Optimize Portfolio
+          </button>
+          <button id="frontier-btn" class="btn btn-secondary">
+            Compute Efficient Frontier
+          </button>
+        </aside>
+
+        <div class="content">
+          <div class="content-header">
+            <h1>Modern Portfolio Theory</h1>
+            <p>
+              Markowitz (1952) mean-variance optimisation via closed-form
+              analytical solutions.
+            </p>
+            <div class="formula">
+              w<sub>MVP</sub> = (Σ<sup>−1</sup> · <b>1</b>) / (<b>1</b
+              ><sup>T</sup> · Σ<sup>−1</sup> · <b>1</b>)
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div id="mpt-empty" class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <h3>No results yet</h3>
+            <p>
+              Select assets and click <em>Optimize Portfolio</em> or
+              <em>Compute Efficient Frontier</em>.
+            </p>
+          </div>
+
+          <!-- Results -->
+          <div id="mpt-results" class="hidden">
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-label">Expected Return (ann.)</div>
+                <div id="metric-return" class="metric-value">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Volatility (ann.)</div>
+                <div id="metric-vol" class="metric-value">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Sharpe Ratio</div>
+                <div id="metric-sharpe" class="metric-value">—</div>
+              </div>
+            </div>
+
+            <div class="charts-grid">
+              <div class="chart-card">
+                <h3>Portfolio Weights</h3>
+                <div class="chart-container">
+                  <canvas id="weights-chart"></canvas>
+                </div>
+              </div>
+              <div class="chart-card">
+                <h3>Efficient Frontier</h3>
+                <div class="chart-container">
+                  <canvas id="frontier-chart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-card">
+              <div class="table-header">
+                <strong>Optimal Weights Breakdown</strong>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Weight</th>
+                    <th>Allocation</th>
+                  </tr>
+                </thead>
+                <tbody id="weights-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- /mpt-results -->
+        </div>
+        <!-- /content -->
+      </section>
+      <!-- /tab-mpt -->
+
+      <!-- ══════════════════════════════════════════════ Factor Tab -->
+      <section id="tab-factor" class="tab-content">
+        <aside class="sidebar">
+          <h2>Configuration</h2>
+
+          <div class="form-group">
+            <label>Asset to Analyse</label>
+            <select id="factor-asset-select">
+              <option disabled selected>Loading…</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Risk Factors</label>
+            <div id="factor-list" class="asset-list">
+              <div class="loading-placeholder">Loading factors…</div>
+            </div>
+          </div>
+
+          <div id="factor-alert" class="alert" role="alert"></div>
+
+          <button id="analyze-btn" class="btn btn-primary">
+            Run Regression
+          </button>
+        </aside>
+
+        <div class="content">
+          <div class="content-header">
+            <h1>Fama-French Factor Analysis</h1>
+            <p>
+              Fama &amp; French (1993) three-factor model via OLS regression on
+              daily excess returns.
+            </p>
+            <div class="formula">
+              R<sub>i</sub> − R<sub>f</sub> = α +
+              β<sub>MKT</sub>(R<sub>m</sub>−R<sub>f</sub>) + β<sub>SMB</sub>·SMB
+              + β<sub>HML</sub>·HML + ε
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div id="factor-empty" class="empty-state">
+            <div class="empty-state-icon">📈</div>
+            <h3>No results yet</h3>
+            <p>
+              Select an asset and factors, then click <em>Run Regression</em>.
+            </p>
+          </div>
+
+          <!-- Results -->
+          <div id="factor-results" class="hidden">
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-label">R² (Explained Variance)</div>
+                <div id="metric-r2" class="metric-value">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Jensen's Alpha (ann.)</div>
+                <div id="metric-alpha" class="metric-value">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Alpha p-value</div>
+                <div id="metric-pval" class="metric-value">—</div>
+              </div>
+            </div>
+
+            <div class="table-card" style="margin-bottom: 16px">
+              <div class="table-header" id="regression-header">
+                <strong>Regression Coefficients</strong>
+                <span id="r-squared-badge" class="badge-green">R² = —</span>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Coefficient</th>
+                    <th>Value</th>
+                    <th>p-value</th>
+                    <th>Significance</th>
+                  </tr>
+                </thead>
+                <tbody id="regression-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="chart-card">
+              <h3>Factor Loadings (β Coefficients)</h3>
+              <div class="chart-container">
+                <canvas id="betas-chart"></canvas>
+              </div>
+            </div>
+          </div>
+          <!-- /factor-results -->
+        </div>
+        <!-- /content -->
+      </section>
+      <!-- /tab-factor -->
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
