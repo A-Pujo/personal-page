@@ -58,12 +58,13 @@ export default function Home() {
               A-Pujo
             </h1>
             <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400 tracking-wide">
-              Public Finance × Tech × Economics
+              Web Dev · Independent Researcher · Financial Data Analyst
             </p>
             <p className="text-lg text-zinc-700 dark:text-zinc-300 max-w-xl">
-              Markets move in ways that often seem random, and life mirrors that
-              unpredictability. I channel my curiosity into building things and
-              exploring the intersection of technology and economics.
+              Public servant at the Indonesian Ministry of Finance. Published
+              researcher in fiscal policy and macroeconomics. Full-stack
+              developer and database administrator bridging data engineering
+              with economic analysis.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
