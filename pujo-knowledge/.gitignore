@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+dist/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Storage
+storage/pdf/*.pdf
+storage/images/*
+storage/thumbnails/*
+storage/embeddings/*
+
+# But keep .gitkeep
+!storage/**/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Build artifacts
+frontend/dist/
+frontend/build/
+
+# Models cache
+python/.cache/
+.cache/
+models/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Temporary files
+*.tmp
+temp/
+tmp/

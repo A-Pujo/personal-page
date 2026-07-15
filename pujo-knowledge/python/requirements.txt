@@ -1,0 +1,40 @@
+# Python AI Engine Requirements
+
+# PDF Processing
+PyMuPDF
+pymupdf4llm
+
+# Document Understanding
+docling
+marker-pdf
+camelot-py[cv]
+pdfplumber
+
+# NLP & ML
+sentence-transformers
+scikit-learn
+spacy
+
+# Database
+psycopg[binary]
+psycopg-pool
+pgvector
+
+# LLM Integration
+openai
+requests
+
+# Utilities
+python-dotenv
+pydantic
+numpy
+pillow
+
+# API
+fastapi
+uvicorn
+python-multipart
+
+# Task Queue
+celery
+redis
