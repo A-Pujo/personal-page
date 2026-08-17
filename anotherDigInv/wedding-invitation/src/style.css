@@ -1,0 +1,340 @@
+:root {
+  --sunset-orange: #ff9e5e;
+  --dusk-purple: #5b4b8a;
+  --lake-blue: #2e6e7e;
+  --gold: #e8c170;
+  --cream: #fff8ed;
+
+  --heading: "Cormorant Garamond", serif;
+  --body: "Poppins", sans-serif;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--dusk-purple);
+  font-family: var(--body);
+  color: var(--cream);
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#scene-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+/* ---------- Loading screen ---------- */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--dusk-purple) 0%, var(--lake-blue) 100%);
+  transition: opacity 0.5s ease;
+}
+
+#loading-screen.loading-screen--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-inner {
+  text-align: center;
+  padding: 24px;
+}
+
+.loading-title {
+  font-family: var(--heading);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--cream);
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+
+.loading-bar-track {
+  width: 220px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 248, 237, 0.2);
+  overflow: hidden;
+  margin: 0 auto 12px;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+.loading-hint {
+  font-size: 0.85rem;
+  color: rgba(255, 248, 237, 0.75);
+}
+
+/* ---------- UI overlay ---------- */
+#ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+}
+
+.quest-card {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(20, 14, 30, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 248, 237, 0.15);
+  border-radius: 20px;
+  padding: 22px 24px 24px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.quest-guest {
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin: 0 0 6px;
+  letter-spacing: 0.03em;
+}
+
+.quest-eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 248, 237, 0.7);
+  margin: 0 0 6px;
+}
+
+.quest-title-main {
+  font-family: var(--heading);
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--cream);
+}
+
+.quest-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 248, 237, 0.85);
+  margin: 0 0 20px;
+}
+
+.quest-body {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--cream);
+  margin: 0 0 18px;
+  transition: opacity 0.3s ease;
+}
+
+.quest-body--hidden {
+  display: none;
+}
+
+.quest-sub-body {
+  font-size: 0.88rem;
+  color: rgba(255, 248, 237, 0.8);
+  margin: 0 0 18px;
+}
+
+.quest-hint {
+  font-size: 0.88rem;
+  color: var(--gold);
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border: 1px dashed rgba(232, 193, 112, 0.5);
+  border-radius: 10px;
+}
+
+.quest-hint--pulse {
+  animation: hint-pulse 0.45s ease-in-out 2;
+}
+
+@keyframes hint-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.quest-reveal--hidden {
+  display: none;
+}
+
+.quest-date {
+  font-family: var(--heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin: 0 0 10px;
+}
+
+.quest-venue-name {
+  font-family: var(--heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 4px 0 2px;
+  color: var(--cream);
+}
+
+.quest-venue-address {
+  font-size: 0.85rem;
+  color: rgba(255, 248, 237, 0.8);
+  margin: 0 0 18px;
+}
+
+.quest-closing {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(255, 248, 237, 0.8);
+  margin: 16px 0 0;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 44px;
+  width: 100%;
+  padding: 12px 20px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--sunset-orange), var(--gold));
+  color: #2a1a10;
+  box-shadow: 0 6px 16px rgba(255, 158, 94, 0.35);
+}
+
+.btn-secondary {
+  background: rgba(255, 248, 237, 0.12);
+  color: var(--cream);
+  border: 1px solid rgba(255, 248, 237, 0.3);
+}
+
+.btn-skip {
+  background: transparent;
+  color: rgba(255, 248, 237, 0.65);
+  font-size: 0.82rem;
+  min-height: 40px;
+  margin-top: 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-hidden {
+  display: none;
+}
+
+/* ---------- Fallback (no WebGL) ---------- */
+#fallback-static {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--dusk-purple) 0%, var(--lake-blue) 100%);
+  padding: 24px;
+}
+
+#fallback-static[hidden] {
+  display: none;
+}
+
+.fallback-card {
+  max-width: 420px;
+  text-align: center;
+}
+
+.fallback-eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 248, 237, 0.7);
+  margin: 0 0 8px;
+}
+
+.fallback-title {
+  font-family: var(--heading);
+  font-size: 2.4rem;
+  margin: 0 0 8px;
+}
+
+.fallback-sub {
+  font-size: 0.95rem;
+  color: rgba(255, 248, 237, 0.85);
+  margin: 0 0 20px;
+}
+
+.fallback-body {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.fallback-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .quest-card {
+    padding: 28px 32px 30px;
+  }
+
+  .btn {
+    width: auto;
+    min-width: 220px;
+  }
+}
