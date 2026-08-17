@@ -1,15 +1,16 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Request
+from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Depends
 import os
 from PIL import Image
 import io
 import time
 import random
+from .auth import get_current_user
 
 router = APIRouter(prefix="/api/uploads", tags=["uploads"])
 
 
 @router.post("/", status_code=201)
-async def upload_image(request: Request, file: UploadFile = File(...)):
+async def upload_image(request: Request, file: UploadFile = File(...), current_user: str = Depends(get_current_user)):
     # Accept optional 'category' form field to place uploads under different folders
     form = await request.form()
     category = (form.get("category") or "thoughts").strip().lower()

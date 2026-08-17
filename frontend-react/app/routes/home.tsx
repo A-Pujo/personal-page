@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { decode } from "html-entities";
+import type { Route } from "./+types/home";
+import { mergeMeta, pageMeta } from "~/lib/meta";
+
+export const meta: Route.MetaFunction = ({ matches }) =>
+  mergeMeta(
+    matches,
+    pageMeta({
+      title: "A-Pujo",
+      description:
+        "Public servant at the Indonesian Ministry of Finance, published fiscal-policy researcher, and full-stack developer bridging data engineering with economic analysis.",
+      path: "/",
+    }),
+  );
 
 const API_BASE =
   (import.meta.env.VITE_API_BASE as string) || "http://localhost:6363";

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router";
 import Spinner from "~/components/Spinner";
 import { useMarkdownRenderer } from "~/components/useMarkdownRenderer";
 import { API_BASE } from "~/lib/api";
+import { usePageMeta } from "~/hooks/usePageMeta";
 
 type Work = {
   id: number;
@@ -45,6 +46,12 @@ export default function WorkDetail() {
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [slug]);
+
+  usePageMeta({
+    title: work?.title || "",
+    description: (work?.description || "").replace(/<[^>]+>/g, "").slice(0, 200),
+    image: resolveImg(work?.images?.[0] || null) || undefined,
+  });
 
   if (loading)
     return (

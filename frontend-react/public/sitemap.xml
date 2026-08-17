@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Static routes only. Individual /thoughts/:slug, /works/:slug, and
+  /analytics/:slug pages are not listed here because they're created
+  dynamically from the backend and this file is static. If that becomes
+  worth automating, generate this at deploy time from the /api/thoughts,
+  /api/works, /api/analytics list endpoints.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://a-pujo.my.id/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://a-pujo.my.id/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://a-pujo.my.id/thoughts</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://a-pujo.my.id/works</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://a-pujo.my.id/analytics</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>

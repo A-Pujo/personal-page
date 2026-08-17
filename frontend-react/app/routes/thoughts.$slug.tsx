@@ -4,12 +4,14 @@ import { decode } from "html-entities";
 import { API_BASE } from "~/lib/api";
 import Spinner from "~/components/Spinner";
 import { useMarkdownRenderer } from "~/components/useMarkdownRenderer";
+import { usePageMeta } from "~/hooks/usePageMeta";
 
 type Thought = {
   id: number;
   title: string;
   slug: string;
   content: string;
+  excerpt?: string | null;
   featured_img?: string | null;
   created_at?: string;
 };
@@ -51,6 +53,12 @@ export default function ThoughtDetail() {
       .catch(() => setThought(null))
       .finally(() => setLoading(false));
   }, [slug]);
+
+  usePageMeta({
+    title: thought?.title || "",
+    description: decodeContent(thought?.excerpt || "").replace(/<[^>]+>/g, ""),
+    image: resolveImg(thought?.featured_img || null) || undefined,
+  });
 
   if (loading)
     return (

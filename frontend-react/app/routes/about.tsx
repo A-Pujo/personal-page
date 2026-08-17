@@ -1,4 +1,17 @@
 import { Mail, MapPin, Github, Linkedin, Book } from "lucide-react";
+import type { Route } from "./+types/about";
+import { mergeMeta, pageMeta } from "~/lib/meta";
+
+export const meta: Route.MetaFunction = ({ matches }) =>
+  mergeMeta(
+    matches,
+    pageMeta({
+      title: "About",
+      description:
+        "Aln Pujo Priambodo — State Treasury Management professional, published researcher in fiscal policy and macroeconomics, and full-stack developer & database administrator.",
+      path: "/about",
+    }),
+  );
 
 export default function About() {
   const fullName = "Aln Pujo Priambodo";

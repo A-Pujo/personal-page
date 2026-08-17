@@ -4,6 +4,19 @@ import { listThoughts } from "~/lib/api";
 import { API_BASE } from "~/lib/api";
 import Spinner from "~/components/Spinner";
 import { toast } from "react-toastify";
+import type { Route } from "./+types/thoughts";
+import { mergeMeta, pageMeta } from "~/lib/meta";
+
+export const meta: Route.MetaFunction = ({ matches }) =>
+  mergeMeta(
+    matches,
+    pageMeta({
+      title: "Thoughts",
+      description:
+        "Essays and notes from Aln Pujo Priambodo on public finance, data engineering, and fiscal policy research.",
+      path: "/thoughts",
+    }),
+  );
 
 const PAGE_SIZE = 8;
 

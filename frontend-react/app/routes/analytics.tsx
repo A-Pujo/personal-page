@@ -2,6 +2,19 @@ import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router";
 import { listAnalytic } from "~/lib/api";
 import Spinner from "~/components/Spinner";
+import type { Route } from "./+types/analytics";
+import { mergeMeta, pageMeta } from "~/lib/meta";
+
+export const meta: Route.MetaFunction = ({ matches }) =>
+  mergeMeta(
+    matches,
+    pageMeta({
+      title: "Analytics",
+      description:
+        "Data reports, notebooks, and analytical write-ups by Aln Pujo Priambodo covering fiscal and economic data.",
+      path: "/analytics",
+    }),
+  );
 
 const LIMIT = 10;
 

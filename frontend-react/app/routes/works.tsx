@@ -3,6 +3,19 @@ import { Link } from "react-router";
 import { toast } from "react-toastify";
 import Spinner from "~/components/Spinner";
 import { API_BASE } from "~/lib/api";
+import type { Route } from "./+types/works";
+import { mergeMeta, pageMeta } from "~/lib/meta";
+
+export const meta: Route.MetaFunction = ({ matches }) =>
+  mergeMeta(
+    matches,
+    pageMeta({
+      title: "Works",
+      description:
+        "Selected projects and technical work by Aln Pujo Priambodo — full-stack development, data engineering, and treasury systems.",
+      path: "/works",
+    }),
+  );
 
 type Work = {
   id: number;

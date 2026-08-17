@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router";
 import Spinner from "~/components/Spinner";
 import { getAnalytic, API_BASE, apiUrl } from "~/lib/api";
+import { usePageMeta } from "~/hooks/usePageMeta";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -137,6 +138,11 @@ export default function AnalyticDetail() {
       mounted = false;
     };
   }, [item, fileUrl]);
+
+  usePageMeta({
+    title: item?.title || "",
+    description: (item?.excerpt || "").slice(0, 200),
+  });
 
   if (loading)
     return (

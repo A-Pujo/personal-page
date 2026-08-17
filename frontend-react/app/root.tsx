@@ -12,6 +12,14 @@ import "react-toastify/dist/ReactToastify.css";
 import type { Route } from "./+types/root";
 import "./app.css";
 import Nav from "~/components/Nav";
+import { pageMeta } from "~/lib/meta";
+
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: "A-Pujo",
+    description:
+      "Aln Pujo Priambodo — Public finance & treasury professional, full-stack developer, and financial data analyst. Fiscal policy research, portfolio and technical writing.",
+  });
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -32,11 +40,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>A-Pujo</title>
-        <meta
-          name="description"
-          content="Public finance & treasury professional • Software engineer • Data Analyst"
-        />
         <Meta />
         <Links />
       </head>
